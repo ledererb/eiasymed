@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyMed — Drawer Showcase</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="drawers.css">
+</head>
+
+<body>
+
+    <header class="hero" style="padding:48px 48px">
+        <h1>EasyMed Drawer Showcase</h1>
+        <p>Interactive drawer components from the Figma UI Kit</p>
+    </header>
+
+    <nav class="showcase-nav" id="nav">
+        <ul>
+            <li><a href="index.html">← Design System</a></li>
+            <li><a href="#patients" class="active">Patients Drawer</a></li>
+            <li><a href="#treatment-plan">Treatment Plan Drawer</a></li>
+            <li><a href="#treatment-detail">Treatment Detail Drawer</a></li>
+        </ul>
+    </nav>
+
+    <!-- ===================== PATIENTS MASTER DRAWER ===================== -->
+    <section class="section" id="patients">
+        <h2 class="section-title">Patients Master Drawer</h2>
+        <p class="section-subtitle">Vizit gyorsnézet — quick visit overview for a patient. Shows patient info,
+            appointment status, current visit details, comments, and payment.</p>
+
+        <div class="drawer-showcase">
+            <!-- Figma Design -->
+            <div class="figma-panel">
+                <div class="figma-panel-header">
+                    <span class="figma-badge">Figma Design</span>
+                    <span class="figma-ref">Node: 166:1064</span>
+                </div>
+                <img src="images/patients_drawer.png" alt="Patients Master Drawer — Figma" class="figma-img">
+            </div>
+
+            <!-- HTML Recreation -->
+            <div class="drawer-panel">
+                <div class="figma-panel-header"><span class="figma-badge html-badge">HTML Recreation</span></div>
+                <div class="drawer" style="width:420px">
+                    <div class="drawer-header">
+                        <span class="drawer-title-sm">Vizit gyorsnézet</span>
+                        <button class="drawer-close">✕</button>
+                    </div>
+
+                    <h2 class="drawer-patient-name">Stefánsdóttir, Gudrun Hrönn</h2>
+                    <p class="drawer-patient-meta">ID: #223456789 • Nő, 65 éves</p>
+
+                    <div class="drawer-section">
+                        <h4 class="drawer-section-title">Korábbi időpontok</h4>
+                        <div class="chip-row">
+                            <span class="chip">2026. Jan. 11. (Sze) 11:00</span>
+                            <span class="chip">2025. Dec. 15. (Hé) 09:30</span>
+                        </div>
+                        <a class="drawer-link" href="#">Összes megtekintése</a>
+                    </div>
+
+                    <div class="drawer-section">
+                        <h4 class="drawer-section-title">Aktuális vizit <span class="icon-reload">⟳</span></h4>
+                        <div class="status-pills">
+                            <span class="pill pill-active">Megérkezett</span>
+                            <span class="pill">Elkezdve</span>
+                            <span class="pill">Lezárva</span>
+                            <span class="pill">Lemondva</span>
+                            <span class="pill">No-show</span>
+                        </div>
+                    </div>
+
+                    <div class="visit-card">
+                        <div class="visit-card-header">
+                            <span>📅 2026. május 5. (P), 10:00</span>
+                            <button class="btn-icon">✎</button>
+                        </div>
+                        <div class="visit-card-body">
+                            <div class="visit-row">
+                                <span class="visit-type">Átadás</span>
+                                <span class="visit-ref">#137425897492</span>
+                            </div>
+                            <p class="visit-desc">Full cirkon híd All-on-4-ra</p>
+                            <p class="visit-doctor"><em>Dr. Harmathy Béla</em></p>
+                            <div class="visit-meta-row">
+                                <span>⏱ 120 perc</span>
+                                <span>🏠 3-as rendelő</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comment-box">
+                        <div class="comment-avatar"><img
+                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Ccircle cx='18' cy='18' r='18' fill='%23ED51A8'/%3E%3Ctext x='18' y='23' text-anchor='middle' fill='white' font-size='14' font-family='Inter'%3EGH%3C/text%3E%3C/svg%3E"
+                                alt="avatar"></div>
+                        <span class="comment-placeholder">Megjegyzés</span>
+                        <button class="btn-send">➤</button>
+                    </div>
+
+                    <div class="drawer-section">
+                        <h4 class="drawer-section-title">Aktuális fizetendő</h4>
+                        <div class="payment-row">
+                            <span class="payment-desc">Full kontúr cirkon híd</span>
+                            <span class="payment-amount">1 210 000 Ft</span>
+                        </div>
+                    </div>
+
+                    <button class="drawer-cta">Ugrás fizetésre</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== TREATMENT PLAN MASTER DRAWER ===================== -->
+    <section class="section" id="treatment-plan">
+        <h2 class="section-title">Treatment Plan Master Drawer</h2>
+        <p class="section-subtitle">Ajánlat gyorsnézet — offer/quote overview with treatment visits, progress, costs,
+            and acceptance status.</p>
+
+        <div class="drawer-showcase">
+            <div class="figma-panel">
+                <div class="figma-panel-header">
+                    <span class="figma-badge">Figma Design</span>
+                    <span class="figma-ref">Node: 174:3609</span>
+                </div>
+                <img src="images/treatment_plan_drawer.png" alt="Treatment Plan Master Drawer — Figma"
+                    class="figma-img">
+            </div>
+
+            <div class="drawer-panel">
+                <div class="figma-panel-header"><span class="figma-badge html-badge">HTML Recreation</span></div>
+                <div class="drawer" style="width:420px">
+                    <div class="drawer-header">
+                        <span class="drawer-title-sm">Ajánlat gyorsnézet</span>
+                        <button class="drawer-close">✕</button>
+                    </div>
+
+                    <div class="offer-header">
+                        <div>
+                            <h2 class="offer-id">#13883239299</h2>
+                            <p class="offer-subject">Tárgy: All-on-4</p>
+                        </div>
+                        <div class="offer-patient">
+                            <span class="offer-patient-name">Bíró János Attila</span>
+                            <span class="offer-patient-id">ID #: 223456789</span>
+                        </div>
+                    </div>
+
+                    <div class="offer-meta">
+                        <div class="offer-meta-left">
+                            <div>Verziószám: v.1</div>
+                            <div>Létrehozta: Dr. Teszt Fogorvos</div>
+                            <div>Dátum: 2026. január 16., 12:31</div>
+                        </div>
+                        <div class="offer-meta-right">
+                            <div>49 éves, 1977. 08. 14.</div>
+                            <div>TAJ: 168 634 123</div>
+                            <div>Egészségbizt: magán</div>
+                        </div>
+                    </div>
+
+                    <div class="drawer-section">
+                        <h4 class="drawer-section-title">Ajánlat státusza</h4>
+                        <div class="status-update">
+                            <div class="status-info">
+                                <span>Utolsó módosítás:</span>
+                                <span>2026. 01 16. 12:31, Dr. Harmathy Béla</span>
+                            </div>
+                            <span class="status-badge-accepted">ELFOGADVA ▾</span>
+                        </div>
+                    </div>
+
+                    <div class="drawer-section">
+                        <div class="progress-row">
+                            <span class="drawer-section-title">Kezelés készültsége</span>
+                            <span class="progress-pct">50%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:50%"></div>
+                        </div>
+                    </div>
+
+                    <div class="visit-card visit-card-blue">
+                        <div class="visit-card-header">
+                            <span>⊕ <span class="visit-label-green">2. VIZIT</span></span>
+                            <span>🔄 2026. 05. 05. 10:00<br>Dr. Kiss Barbara</span>
+                        </div>
+                        <div class="visit-card-body">
+                            <div class="treatment-line"><span>Digitális lenyomatvétel</span><span>Teljes szájüreg</span>
+                            </div>
+                            <div class="treatment-line"><span>Felépítmény, Dynamic Abutment</span><span>x4</span></div>
+                            <div class="treatment-line"><span>Full kontúr cirkon híd All-on-4-ra</span><span>x4</span>
+                            </div>
+                            <div class="treatment-line"><span>Rögzítés, végleges</span><span>x4</span></div>
+                            <div class="treatment-line"><span>Harapásemelő</span><span></span></div>
+                            <div class="treatment-line treatment-total"><span>FIZETENDŐ</span><span
+                                    class="amount-badge">1 210 000 Ft</span></div>
+                        </div>
+                    </div>
+
+                    <div class="visit-card visit-card-green">
+                        <div class="visit-card-header">
+                            <span>✓ <span class="visit-label-green">1. VIZIT</span></span>
+                            <span>2026. 01. 29. 14:45<br>Dr. Harmathy Béla</span>
+                        </div>
+                        <div class="visit-card-body">
+                            <div class="treatment-line"><span>CT 8×15</span><span>Teljes szájüreg</span></div>
+                            <div class="treatment-line"><span>Érzéstelenítés</span><span>x4</span></div>
+                            <div class="treatment-line"><span>Nobel Replace CC implantátum</span><span>x4</span></div>
+                            <div class="treatment-line"><span>Nobel BioCare Multiunit felépítmény</span><span>x4</span>
+                            </div>
+                            <div class="treatment-line"><span>Ideiglenes híd All-on-4-ra</span><span></span></div>
+                            <div class="treatment-line treatment-total"><span>FIZETVE</span><span
+                                    class="amount-badge amount-paid">1 725 500 Ft</span></div>
+                        </div>
+                    </div>
+
+                    <div class="total-row">
+                        <span>Kezelés összesen</span>
+                        <span class="total-amount">3 675 000 Ft</span>
+                    </div>
+
+                    <button class="drawer-cta">Ugrás kezelésre</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== TREATMENT DETAIL DRAWER ===================== -->
+    <section class="section" id="treatment-detail">
+        <h2 class="section-title">Treatment Detail Drawer</h2>
+        <p class="section-subtitle">Kezelés gyorsnézet — detailed treatment history with timeline, documents, doctor
+            comments, prescriptions, and costs.</p>
+
+        <div class="drawer-showcase">
+            <div class="figma-panel">
+                <div class="figma-panel-header">
+                    <span class="figma-badge">Figma Design</span>
+                    <span class="figma-ref">Node: 327:1131</span>
+                </div>
+                <img src="images/treatment_detail_drawer.png" alt="Treatment Detail Drawer — Figma" class="figma-img">
+            </div>
+
+            <div class="drawer-panel">
+                <div class="figma-panel-header"><span class="figma-badge html-badge">HTML Recreation</span></div>
+                <div class="drawer" style="width:460px">
+                    <div class="drawer-header">
+                        <span class="drawer-title-sm">Kezelés gyorsnézet</span>
+                        <button class="drawer-close">✕</button>
+                    </div>
+
+                    <div class="detail-patient-header">
+                        <div>
+                            <h2 class="drawer-patient-name">Bíró János Attila</h2>
+                            <p class="drawer-patient-meta">1968. 08. 14., 54 éves</p>
+                        </div>
+                        <div class="detail-ids">
+                            <span>ID #: 223456789</span>
+                            <span>TAJ: 168 634 123</span>
+                        </div>
+                    </div>
+
+                    <div class="drawer-section">
+                        <div class="detail-meta-row">
+                            <span class="drawer-section-title">Kedvezmény / címkék</span>
+                            <span class="detail-none"><em>nincs</em></span>
+                        </div>
+                    </div>
+
+                    <div class="drawer-section">
+                        <h4 class="drawer-section-title">Dokumentumok</h4>
+                        <div class="doc-chips">
+                            <span class="doc-chip doc-chip-blue">Páciensdokumentáció</span>
+                            <span class="doc-chip doc-chip-green">Receptek</span>
+                            <span class="doc-chip doc-chip-yellow">Beutalók</span>
+                            <span class="doc-chip doc-chip-pink">Ambulánslapok</span>
+                        </div>
+                    </div>
+
+                    <div class="drawer-section">
+                        <h4 class="drawer-section-title">Előzmények</h4>
+
+                        <!-- Timeline Entry 1 -->
+                        <div class="timeline">
+                            <div class="timeline-date">
+                                <span class="tl-date">JAN. 27.</span>
+                                <span class="tl-time">(Ke) 14:00</span>
+                            </div>
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="tl-card">
+                                    <div class="tl-header">
+                                        <div>
+                                            <span class="tl-type tl-type-pink">All-on-4 műtét</span>
+                                            <span class="tl-ref">#13883239299 (2/1 vizit)</span>
+                                        </div>
+                                        <div class="tl-doctor">
+                                            <span>Dr. Harmathy Béla</span>
+                                            <span class="tl-assistant">Asszisztens: Németh Lilla</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="tl-procedures">CT 8×15 / Érzéstelenítés / Nobel Replace CC implantátum /
+                                        Nobel BioCare Multiunit felépítmény / Ideiglenes híd All-on-4-ra / Harapásemelő
+                                    </div>
+
+                                    <div class="tl-comment">
+                                        <div class="tl-comment-avatar"><img
+                                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Ccircle cx='18' cy='18' r='18' fill='%2362A9CD'/%3E%3Ctext x='18' y='23' text-anchor='middle' fill='white' font-size='13' font-family='Inter'%3EHB%3C/text%3E%3C/svg%3E"
+                                                alt=""></div>
+                                        <div>
+                                            <div class="tl-comment-meta">Dr. Harmathy Béla<br><span>2026. 01. 15. (Hé)
+                                                    14:53</span></div>
+                                            <p class="tl-comment-text">Lorem ipsum dolor sit amet, consectetur
+                                                adipiscing elit. Sed luctus venenatis malesuada. Vivamus sed dolor
+                                                mperdiet, cursus erat et, interdum felis.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="tl-docs">
+                                        <span class="tl-doc">📋 Recept (Augmentin DUO 625 mg)</span>
+                                        <span class="tl-doc">💊 Gyógyszercsomag (1db)</span>
+                                        <span class="tl-doc">📄 Ambulánslap</span>
+                                    </div>
+
+                                    <div class="tl-cost-row">
+                                        <span>Vizit díja összesen:</span>
+                                        <span class="amount-badge">750 000 Ft</span>
+                                    </div>
+                                    <div class="tl-cost-row tl-cost-sub">
+                                        <span>Kezelési terv értéke</span>
+                                        <span>3 670 000 Ft</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Entry 2 -->
+                        <div class="timeline">
+                            <div class="timeline-date">
+                                <span class="tl-date">JAN. 15.</span>
+                                <span class="tl-time">(Ke) 14:00</span>
+                            </div>
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="tl-card">
+                                    <div class="tl-header">
+                                        <div>
+                                            <span class="tl-type tl-type-yellow">Konzultáció</span>
+                                            <span class="tl-ref">#13883239298</span>
+                                        </div>
+                                        <div class="tl-doctor">
+                                            <span>Dr. Harmathy Béla</span>
+                                            <span class="tl-assistant">Asszisztens: Németh Lilla</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="tl-procedures">Panoráma röntgen / Szájvizsgálat, állapotfelmérés</div>
+
+                                    <div class="tl-comment">
+                                        <div class="tl-comment-avatar"><img
+                                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Ccircle cx='18' cy='18' r='18' fill='%2362A9CD'/%3E%3Ctext x='18' y='23' text-anchor='middle' fill='white' font-size='13' font-family='Inter'%3EHB%3C/text%3E%3C/svg%3E"
+                                                alt=""></div>
+                                        <div>
+                                            <div class="tl-comment-meta">Dr. Harmathy Béla<br><span>2026. 01. 15. (Hé)
+                                                    14:53</span></div>
+                                            <p class="tl-comment-text">Lorem ipsum dolor sit amet, consectetur
+                                                adipiscing elit.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="tl-docs">
+                                        <span class="tl-doc">📄 Ambulánslap beküldve</span>
+                                    </div>
+
+                                    <div class="tl-cost-row">
+                                        <span>Vizit díja összesen:</span>
+                                        <span class="amount-badge amount-paid">33 000 Ft</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>EasyMed Drawer Showcase &middot; <a href="index.html" style="color:var(--primary-200)">← Back to Design
+                System</a></p>
+    </footer>
+
+    <script>
+        // Nav active state
+        const navLinks = document.querySelectorAll('.showcase-nav a');
+        const sections = document.querySelectorAll('.section');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+            navLinks.forEach(a => {
+                if (a.getAttribute('href').startsWith('#'))
+                    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+            });
+        });
+    </script>
+</body>
+
+</html>

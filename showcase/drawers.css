@@ -1,0 +1,879 @@
+/* ============================================================
+   DRAWER SHOWCASE — Pixel-perfect from Figma API
+   Source of Truth: Figma file UxIutgwUWtI9lbuBE5bHYD
+   ============================================================ */
+
+/* ── Showcase Layout ── */
+.drawer-showcase {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.figma-panel {
+    flex: 0 0 auto;
+    max-width: 420px;
+}
+
+.figma-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.figma-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: var(--neutral-100);
+    color: var(--neutral-600);
+}
+
+.html-badge {
+    background: var(--primary-50);
+    color: var(--primary-500);
+}
+
+.figma-img {
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: var(--shadow-300);
+    border: 1px solid var(--neutral-200);
+}
+
+.drawer-panel {
+    flex: 0 0 auto;
+}
+
+/* ── Drawer Container ──
+   Figma: cornerRadius=20, bg=#FFFFFF, padding=30/30/20/20 (L/R/T/B) */
+.drawer {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 20px 30px 20px 30px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+    overflow: visible;
+    font-family: 'Inter', sans-serif;
+    color: #082432;
+}
+
+/* ── Drawer Header ──
+   Figma: "Vizit gyorsnézet" 12px/w400 #5F7D95, close button */
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.drawer-title-sm {
+    font-size: 12px;
+    font-weight: 400;
+    color: #5F7D95;
+}
+
+.drawer-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #5F7D95;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.drawer-close:hover {
+    background: #F5F5F5;
+}
+
+/* ── Patient Name ──
+   Figma: 22px/w700 #C43284 */
+.drawer-patient-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #C43284;
+    margin-bottom: 2px;
+    line-height: 1.2;
+}
+
+/* Figma: 12px/w400 #5F7D95 */
+.drawer-patient-meta {
+    font-size: 12px;
+    font-weight: 400;
+    color: #5F7D95;
+    margin-bottom: 20px;
+}
+
+/* ── Section Titles ──
+   Figma: 14px/w600 #082432 */
+.drawer-section {
+    margin-bottom: 16px;
+}
+
+.drawer-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #082432;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon-reload {
+    font-size: 14px;
+    color: #186D98;
+    cursor: pointer;
+}
+
+/* ── Chips (Previous Appointments) ──
+   Figma: cornerRadius=4, border=#BFC8CE 1px INSIDE, text 12px/w500 */
+.chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.chip {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #BFC8CE;
+    color: #082432;
+    white-space: nowrap;
+    background: #FFFFFF;
+}
+
+.drawer-link {
+    font-size: 12px;
+    font-weight: 500;
+    color: #5F7D95;
+    text-decoration: underline;
+}
+
+/* ── Status Pills ──
+   Figma: cornerRadius=4, border=#BFC8CE 1px, text 12px/w500
+   Active: border=#C43284, bg=#FFF1F9 */
+.status-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.pill {
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #BFC8CE;
+    color: #082432;
+    background: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.pill:hover {
+    border-color: #186D98;
+}
+
+.pill-active {
+    border-color: #C43284;
+    color: #C43284;
+    background: #FFF1F9;
+    font-weight: 500;
+}
+
+/* ── Visit Card (Name Card) ──
+   Figma: cornerRadius=15, gradient fill opacity=0.5:
+     stop@0.20: rgba(192,251,249,1.00) → stop@0.61: rgba(255,241,249,1.00) → stop@0.91: rgba(255,229,243,1.00)
+   Effect: DROP_SHADOW rgba(0,0,0,0.15) offset=(0,1) r=4 */
+.visit-card {
+    background: linear-gradient(128deg,
+            rgba(192, 251, 249, 0.5) 20%,
+            rgba(255, 241, 249, 0.5) 61%,
+            rgba(255, 229, 243, 0.5) 91%);
+    border-radius: 15px;
+    padding: 10px 15px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Visit card inner text:
+   Date: 16px/w500 #082432
+   Type label (Átadás): 14px/w600 #C43284
+   Ref (#137...): 14px/w400 #186D98
+   Description: 14px/w400 #082432
+   Doctor: 14px/w300 #082432
+   Meta (120 perc): 12px/w400 #082432 */
+.visit-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.visit-card-date {
+    font-size: 16px;
+    font-weight: 500;
+    color: #082432;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #186D98;
+    cursor: pointer;
+}
+
+.visit-card-body {
+    font-size: 14px;
+}
+
+.visit-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.visit-type {
+    font-size: 14px;
+    font-weight: 600;
+    color: #C43284;
+}
+
+.visit-ref {
+    font-size: 14px;
+    font-weight: 400;
+    color: #186D98;
+}
+
+.visit-desc {
+    font-size: 14px;
+    font-weight: 400;
+    color: #082432;
+    margin-bottom: 2px;
+}
+
+.visit-doctor {
+    font-size: 14px;
+    font-weight: 300;
+    color: #082432;
+    margin-bottom: 8px;
+    font-style: italic;
+}
+
+.visit-meta-row {
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    font-weight: 400;
+    color: #082432;
+}
+
+/* ── Comment Box ──
+   Figma: cornerRadius=10, border=#D9D9D9 1px, padding=20/20/10/10 (L/R/T/B) */
+.comment-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    border: 1px solid #D9D9D9;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    background: #FFFFFF;
+}
+
+/* Avatar: 40x40 cornerRadius=200 (circle), stroke=#FFF 4px, shadow */
+.comment-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 200px;
+    border: 4px solid #FFFFFF;
+    box-shadow: 0 4px 6px rgba(10, 12, 18, 0.03), 0 12px 16px rgba(10, 12, 18, 0.08);
+}
+
+.comment-placeholder {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 500;
+    color: #186D98;
+}
+
+.btn-send {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #5F7D95;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.btn-send:hover {
+    color: #186D98;
+}
+
+/* ── Payment Section ──
+   Title: 14px/w600 #082432
+   Desc: 12px/w400 #5F7D95
+   Amount: 20px/w700 #082432 */
+.payment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.payment-desc {
+    font-size: 12px;
+    font-weight: 400;
+    color: #5F7D95;
+}
+
+.payment-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: #082432;
+}
+
+/* ── CTA Button ──
+   Figma: cornerRadius=15, bg=#C43284, text 16px/w600 #FFFFFF
+   padding: 150/150/10/10 (horizontal center via flexbox) */
+.drawer-cta {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: #C43284;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 15px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 12px;
+    text-align: center;
+}
+
+.drawer-cta:hover {
+    background: #A2005B;
+}
+
+/* ============================================================
+   TREATMENT PLAN DRAWER
+   Figma: 500x940, cornerRadius=20, bg=#FFFFFF, padding=30/30/20/20
+   ============================================================ */
+
+/* ── Offer Header ──
+   ID: 22px/w700 #186D98; Subject: 14px/w500 #C43284
+   Patient name: 14px/w600 #186D98; Patient ID: 12px/w400 #5F7D95
+   Separator: dashed 1px #BFC8CE */
+.offer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #BFC8CE;
+}
+
+.offer-id {
+    font-size: 22px;
+    font-weight: 700;
+    color: #186D98;
+}
+
+.offer-subject {
+    font-size: 14px;
+    color: #C43284;
+    font-weight: 500;
+}
+
+.offer-patient {
+    text-align: right;
+}
+
+.offer-patient-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #186D98;
+    display: block;
+}
+
+.offer-patient-id {
+    font-size: 12px;
+    color: #5F7D95;
+    font-weight: 400;
+}
+
+/* ── Offer Meta ──
+   11px/w400 #5F7D95, border-bottom: 1px solid #ECECEC */
+.offer-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 400;
+    color: #5F7D95;
+    line-height: 1.8;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ECECEC;
+}
+
+.offer-meta-right {
+    text-align: right;
+}
+
+/* ── Status Badge ──
+   Figma: cornerRadius=8, bg=#32B000, text 12px/w500 #FFF, padding=8/8/4/4 */
+.status-update {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-info {
+    font-size: 11px;
+    color: #5F7D95;
+    line-height: 1.6;
+}
+
+.status-badge-accepted {
+    background: #32B000;
+    color: #FFFFFF;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* ── Progress Bar ──
+   Track: 6px bg=#ECECEC radius=100; Fill: gradient */
+.progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.progress-pct {
+    font-size: 14px;
+    font-weight: 600;
+    color: #186D98;
+}
+
+.progress-bar {
+    height: 6px;
+    background: #ECECEC;
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #186D98, #1CEEE0);
+    border-radius: 100px;
+    transition: width 0.5s ease;
+}
+
+/* ── Visit Cards (Treatment Plan) ──
+   Figma: cornerRadius=15, border-left 3px, padding=10/10
+   Blue variant: left border=#186D98, subtle bg
+   Green variant: left border=#32B000 */
+.visit-card-blue {
+    background: linear-gradient(128deg,
+            rgba(192, 251, 249, 0.15) 20%,
+            rgba(255, 241, 249, 0.08) 61%,
+            rgba(255, 229, 243, 0.05) 91%);
+    border-left: 3px solid #186D98;
+}
+
+.visit-card-green {
+    background: rgba(50, 176, 0, 0.04);
+    border-left: 3px solid #32B000;
+}
+
+.visit-label-green {
+    color: #32B000;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.visit-card-header span {
+    font-size: 12px;
+}
+
+/* ── Treatment Lines ──
+   12px/w400 #082432 */
+.treatment-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: 12px;
+    color: #082432;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.treatment-line:last-child {
+    border-bottom: none;
+}
+
+.treatment-total {
+    font-weight: 600;
+    margin-top: 4px;
+    padding-top: 6px;
+    border-top: 1px solid #D9D9D9;
+}
+
+/* ── Amount Badge ──
+   Figma: cornerRadius=50, bg=#C43284, text 12px/w500 #FFF, padding 8/8/4/4 */
+.amount-badge {
+    background: #C43284;
+    color: #FFFFFF;
+    padding: 4px 8px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Paid variant: bg=#32B000 */
+.amount-paid {
+    background: #32B000;
+}
+
+/* ── Total Row ──
+   14px/w600 #082432; Amount: 22px/w700 */
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #082432;
+}
+
+.total-amount {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* ============================================================
+   TREATMENT DETAIL DRAWER
+   Figma: 600x1128, bg=#FFFFFF, cornerRadius=20
+   ============================================================ */
+
+.detail-patient-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.detail-ids {
+    text-align: right;
+    font-size: 12px;
+    font-weight: 400;
+    color: #5F7D95;
+    line-height: 1.8;
+}
+
+.detail-ids span {
+    display: block;
+}
+
+.detail-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.detail-none {
+    font-size: 12px;
+    color: #BFC8CE;
+    font-style: italic;
+}
+
+/* ── Document Chips ──
+   Figma: cornerRadius=50, various bg colors, text 12px/w500 */
+.doc-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.doc-chip {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+
+.doc-chip:hover {
+    transform: scale(1.05);
+}
+
+.doc-chip-blue {
+    background: #B7E4FF;
+    color: #186D98;
+}
+
+.doc-chip-green {
+    background: #D7EBCF;
+    color: #1B6100;
+}
+
+.doc-chip-yellow {
+    background: #FFE8A7;
+    color: #082432;
+}
+
+.doc-chip-pink {
+    background: #FFF1F9;
+    color: #C43284;
+}
+
+/* ── Timeline ──
+   Figma: Vertical dashed line=#5F7D95 strokeDashes=[2,2] strokeWeight=1
+   Dots: 10x10 circle fill=#082432
+   Date: 12px/w500 #082432 textAlign=RIGHT */
+.timeline {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.timeline-date {
+    flex: 0 0 65px;
+    text-align: right;
+}
+
+.tl-date {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #082432;
+}
+
+.tl-time {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #082432;
+}
+
+.timeline-dot {
+    flex: 0 0 10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #082432;
+    margin-top: 4px;
+    position: relative;
+}
+
+/* Dashed vertical line: #5F7D95, dashes 2/2 */
+.timeline-dot::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 4px;
+    width: 1px;
+    height: calc(100% + 20px);
+    background: repeating-linear-gradient(to bottom, #5F7D95 0, #5F7D95 2px, transparent 2px, transparent 4px);
+}
+
+.timeline:last-child .timeline-dot::after {
+    display: none;
+}
+
+.timeline-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ── Timeline Card ──
+   Figma: cornerRadius=15, border=#BFC8CE 1px dashed, padding=20/20/10/10 */
+.tl-card {
+    border: 1px dashed #BFC8CE;
+    border-radius: 15px;
+    padding: 10px 20px;
+}
+
+.tl-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+/* Type: 14px/w600 */
+.tl-type {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.tl-type-pink {
+    color: #C43284;
+}
+
+.tl-type-yellow {
+    color: #FFCE48;
+}
+
+/* Ref: 12px/w400 #C43284 */
+.tl-ref {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: #C43284;
+}
+
+/* Doctor: 12px/w500 #082432 */
+.tl-doctor {
+    text-align: right;
+    font-size: 12px;
+    font-weight: 500;
+    color: #082432;
+}
+
+.tl-assistant {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: #5F7D95;
+}
+
+/* ── Procedures ──
+   Figma: bg=#F5F5F5, cornerRadius=10, padding=10, text 12px/w400 #5F7D95 */
+.tl-procedures {
+    font-size: 12px;
+    font-weight: 400;
+    color: #5F7D95;
+    background: #F5F5F5;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+/* ── Comment Block ──
+   Figma: bg=#F5F5F5, cornerRadius=10, padding=20/20/10/15
+   Avatar: 40x40 circle, stroke=#FFF 4px
+   Name: 12px/w400 #082432; Date: 12px/w400 #5F7D95
+   Body: 12px/w400 #082432 */
+.tl-comment {
+    display: flex;
+    gap: 10px;
+    background: #F5F5F5;
+    padding: 10px 20px 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.tl-comment-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 200px;
+    border: 4px solid #FFFFFF;
+    box-shadow: 0 4px 6px rgba(10, 12, 18, 0.03), 0 12px 16px rgba(10, 12, 18, 0.08);
+}
+
+.tl-comment-meta {
+    font-size: 12px;
+    font-weight: 400;
+    color: #082432;
+    margin-bottom: 4px;
+}
+
+.tl-comment-meta span {
+    font-weight: 400;
+    color: #5F7D95;
+    font-size: 12px;
+}
+
+.tl-comment-text {
+    font-size: 12px;
+    font-weight: 400;
+    color: #082432;
+    line-height: 1.5;
+}
+
+/* ── Document Links ──
+   Figma: 12px/w500 #186D98 */
+.tl-docs {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.tl-doc {
+    font-size: 12px;
+    font-weight: 500;
+    color: #186D98;
+    cursor: pointer;
+}
+
+.tl-doc:hover {
+    text-decoration: underline;
+}
+
+/* ── Cost Rows ──
+   Main: 12px/w600 #082432; Sub: 12px/w400 #5F7D95 */
+.tl-cost-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #082432;
+    margin-top: 6px;
+}
+
+.tl-cost-sub {
+    font-weight: 400;
+    color: #5F7D95;
+    margin-top: 2px;
+}
+
+/* ── Separator Line ──
+   Figma: stroke=#ECECEC 1px */
+.tl-separator {
+    border: none;
+    border-top: 1px solid #ECECEC;
+    margin: 16px 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+    .drawer-showcase {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .figma-panel,
+    .drawer-panel {
+        max-width: 100%;
+    }
+
+    .drawer {
+        width: 100% !important;
+    }
+}

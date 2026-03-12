@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EasyMed UI Kit — Design Showcase</title>
+  <meta name="description"
+    content="Design system showcase for EasyMed dental ERP. Tokens, components, and panels from the Figma UI kit.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="drawers.css">
+</head>
+
+<body>
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1>EasyMed Design System</h1>
+    <p>UI Kit Showcase — Dental ERP &middot; Figma file: UI KIT_eaisymed</p>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="showcase-nav" id="nav">
+    <ul>
+      <li><a href="#colors" class="active">Colors</a></li>
+      <li><a href="#gradients">Gradients</a></li>
+      <li><a href="#typography">Typography</a></li>
+      <li><a href="#shadows">Shadows</a></li>
+      <li><a href="#strokes">Strokes</a></li>
+      <li><a href="#buttons">Buttons</a></li>
+      <li><a href="#badges">Badges &amp; Status</a></li>
+      <li><a href="#inputs">Inputs</a></li>
+      <li><a href="#dropdowns">Dropdowns</a></li>
+      <li><a href="#tables">Tables</a></li>
+      <li><a href="#avatars">Avatars</a></li>
+      <li><a href="#notifications">Notifications</a></li>
+      <li><a href="#panels">Panels</a></li>
+      <li><a href="#patients">Patient Drawer</a></li>
+      <li><a href="#treatment-plan">Treatment Plan</a></li>
+      <li><a href="#treatment-detail">Treatment Detail</a></li>
+    </ul>
+  </nav>
+
+  <!-- ===================== COLORS ===================== -->
+  <section class="section" id="colors">
+    <h2 class="section-title">Color Palette</h2>
+    <p class="section-subtitle">Click any swatch to copy its hex value. All colors extracted from Figma.</p>
+
+    <div class="swatch-group">
+      <h3>Neutral</h3>
+      <div class="swatches" id="neutral-swatches"></div>
+    </div>
+    <div class="swatch-group">
+      <h3>Primary</h3>
+      <div class="swatches" id="primary-swatches"></div>
+    </div>
+    <div class="swatch-group">
+      <h3>Brand</h3>
+      <div class="swatches" id="brand-swatches"></div>
+    </div>
+    <div class="swatch-group">
+      <h3>Status</h3>
+      <div class="swatches" id="status-swatches"></div>
+    </div>
+    <div class="swatch-group">
+      <h3>Calendar Events</h3>
+      <div class="swatches" id="calendar-swatches"></div>
+    </div>
+  </section>
+
+  <!-- ===================== GRADIENTS ===================== -->
+  <section class="section" id="gradients">
+    <h2 class="section-title">Gradients</h2>
+    <p class="section-subtitle">9 gradient tokens from the design system, click to copy CSS.</p>
+    <div class="gradient-grid" id="gradient-grid"></div>
+  </section>
+
+  <!-- ===================== TYPOGRAPHY ===================== -->
+  <section class="section" id="typography">
+    <h2 class="section-title">Typography</h2>
+    <p class="section-subtitle">Font family: Inter &middot; Weights: 300–700 &middot; Sizes: 8–24px</p>
+    <div id="type-list"></div>
+  </section>
+
+  <!-- ===================== SHADOWS ===================== -->
+  <section class="section" id="shadows">
+    <h2 class="section-title">Drop Shadows</h2>
+    <p class="section-subtitle">5 elevation levels for cards, modals, and interactive elements.</p>
+    <div class="shadow-grid" id="shadow-grid"></div>
+  </section>
+
+  <!-- ===================== STROKES ===================== -->
+  <section class="section" id="strokes">
+    <h2 class="section-title">Strokes</h2>
+    <p class="section-subtitle">Border and divider colors from the design system.</p>
+    <div class="stroke-grid" id="stroke-grid"></div>
+  </section>
+
+  <!-- ===================== BUTTONS ===================== -->
+  <section class="section" id="buttons">
+    <h2 class="section-title">Buttons</h2>
+    <p class="section-subtitle">Primary, brand, outline, and ghost variants with size modifiers.</p>
+    <div class="component-grid">
+      <div class="comp-card">
+        <h4>Primary Buttons</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+          <button class="btn btn-primary btn-sm">Small</button>
+          <button class="btn btn-primary">Default</button>
+          <button class="btn btn-primary btn-lg">Large</button>
+        </div>
+      </div>
+      <div class="comp-card">
+        <h4>Brand Buttons</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+          <button class="btn btn-brand btn-sm">Small</button>
+          <button class="btn btn-brand">Default</button>
+          <button class="btn btn-brand btn-lg">Large</button>
+        </div>
+      </div>
+      <div class="comp-card">
+        <h4>Outline &amp; Ghost</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+          <button class="btn btn-outline">Outline</button>
+          <button class="btn btn-ghost">Ghost</button>
+        </div>
+      </div>
+      <div class="comp-card">
+        <h4>Icon Buttons</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+          <button class="btn btn-primary">＋ Új páciens</button>
+          <button class="btn btn-brand">📋 Kezelési terv</button>
+          <button class="btn btn-outline">🔍 Keresés</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BADGES ===================== -->
+  <section class="section" id="badges">
+    <h2 class="section-title">Badges &amp; Status</h2>
+    <p class="section-subtitle">Patient and treatment workflow status indicators.</p>
+    <div class="component-grid">
+      <div class="comp-card">
+        <h4>Status Badges</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:8px" id="status-badges"></div>
+      </div>
+      <div class="comp-card">
+        <h4>Calendar Event Colors</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:8px" id="cal-badges"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== INPUTS ===================== -->
+  <section class="section" id="inputs">
+    <h2 class="section-title">Input Fields</h2>
+    <p class="section-subtitle">Form inputs with labels, focus states, and placeholders.</p>
+    <div class="component-grid">
+      <div class="comp-card">
+        <h4>Text Inputs</h4>
+        <div class="input-preview">
+          <div>
+            <label class="input-label">Páciens neve</label>
+            <input class="input-field" type="text" placeholder="Pl. Kovács Anna">
+          </div>
+          <div>
+            <label class="input-label">TAJ szám</label>
+            <input class="input-field" type="text" placeholder="000 000 000">
+          </div>
+          <div>
+            <label class="input-label">Megjegyzés</label>
+            <input class="input-field" type="text" placeholder="Opcionális megjegyzés...">
+          </div>
+        </div>
+      </div>
+      <div class="comp-card">
+        <h4>Disabled &amp; Read-only</h4>
+        <div class="input-preview">
+          <div>
+            <label class="input-label">Azonosító (read-only)</label>
+            <input class="input-field" type="text" value="PAT-20260305-001" readonly
+              style="background:var(--neutral-50)">
+          </div>
+          <div>
+            <label class="input-label">Disabled field</label>
+            <input class="input-field" type="text" value="Nem szerkeszthető" disabled style="opacity:0.5">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DROPDOWNS ===================== -->
+  <section class="section" id="dropdowns">
+    <h2 class="section-title">Dropdowns</h2>
+    <p class="section-subtitle">Selection dropdowns used across the dental ERP.</p>
+    <div class="component-grid">
+      <div class="comp-card">
+        <h4>Kezelés típusa</h4>
+        <div class="dropdown-preview">
+          <div class="dropdown-toggle">
+            <span>Válasszon kezelést...</span>
+            <span>▾</span>
+          </div>
+          <div class="dropdown-menu">
+            <div class="dropdown-item active">Konzultáció</div>
+            <div class="dropdown-item">Fogkő eltávolítás</div>
+            <div class="dropdown-item">Tömés</div>
+            <div class="dropdown-item">Gyökérkezelés</div>
+            <div class="dropdown-item">Korona</div>
+          </div>
+        </div>
+      </div>
+      <div class="comp-card">
+        <h4>Breadcrumbs</h4>
+        <div class="breadcrumb">
+          <span class="breadcrumb-item">Főoldal</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-item">Páciensek</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-active">Kovács Anna</span>
+        </div>
+        <br>
+        <div class="breadcrumb">
+          <span class="breadcrumb-item">Kezelések</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-item">Kezelési Terv</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-active">#KT-20260305</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TABLES ===================== -->
+  <section class="section" id="tables">
+    <h2 class="section-title">Tables</h2>
+    <p class="section-subtitle">Data tables for patient and treatment records.</p>
+    <div class="comp-card" style="overflow-x:auto;max-width:100%">
+      <h4>Páciens Lista</h4>
+      <table class="table-preview">
+        <thead>
+          <tr>
+            <th>Név</th>
+            <th>TAJ</th>
+            <th>Születési dátum</th>
+            <th>Státusz</th>
+            <th>Utolsó kezelés</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Kovács Anna</td>
+            <td>123 456 789</td>
+            <td>1985.03.15</td>
+            <td><span class="badge" style="background:#E8F5E9;color:#32B000">● Aktív</span></td>
+            <td>2026.02.28</td>
+          </tr>
+          <tr>
+            <td>Nagy Péter</td>
+            <td>987 654 321</td>
+            <td>1972.11.02</td>
+            <td><span class="badge" style="background:#FFF8E1;color:#E65100">● Várakozik</span></td>
+            <td>2026.01.15</td>
+          </tr>
+          <tr>
+            <td>Szabó Éva</td>
+            <td>456 789 123</td>
+            <td>1990.07.22</td>
+            <td><span class="badge" style="background:#E3F2FD;color:#186D98">● Új</span></td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Tóth Gábor</td>
+            <td>321 654 987</td>
+            <td>1968.04.10</td>
+            <td><span class="badge" style="background:#FFEBEE;color:#FF0000">● Sürgős</span></td>
+            <td>2026.03.04</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== AVATARS ===================== -->
+  <section class="section" id="avatars">
+    <h2 class="section-title">Avatars</h2>
+    <p class="section-subtitle">Doctor and patient avatars in multiple sizes.</p>
+    <div class="component-grid">
+      <div class="comp-card">
+        <h4>Sizes</h4>
+        <div class="avatar-grid">
+          <div>
+            <div class="avatar avatar-sm">KA</div>
+            <div style="font-size:10px;color:var(--neutral-600);text-align:center;margin-top:4px">32px</div>
+          </div>
+          <div>
+            <div class="avatar avatar-md">NP</div>
+            <div style="font-size:10px;color:var(--neutral-600);text-align:center;margin-top:4px">44px</div>
+          </div>
+          <div>
+            <div class="avatar avatar-lg">SZ</div>
+            <div style="font-size:10px;color:var(--neutral-600);text-align:center;margin-top:4px">64px</div>
+          </div>
+        </div>
+      </div>
+      <div class="comp-card">
+        <h4>Roles</h4>
+        <div class="avatar-grid">
+          <div>
+            <div class="avatar avatar-md" style="background:var(--grad-dark-blue)">Dr</div>
+            <div style="font-size:10px;color:var(--neutral-600);text-align:center;margin-top:4px">dr</div>
+          </div>
+          <div>
+            <div class="avatar avatar-md" style="background:var(--grad-dark-pink)">Dr</div>
+            <div style="font-size:10px;color:var(--neutral-600);text-align:center;margin-top:4px">drnő</div>
+          </div>
+          <div>
+            <div class="avatar avatar-md" style="background:var(--neutral-400)">P</div>
+            <div style="font-size:10px;color:var(--neutral-600);text-align:center;margin-top:4px">Páciens</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== NOTIFICATIONS ===================== -->
+  <section class="section" id="notifications">
+    <h2 class="section-title">Notification Modals</h2>
+    <p class="section-subtitle">Feedback messages for user actions.</p>
+    <div class="comp-card" style="max-width:600px">
+      <div class="modal-preview">
+        <div class="modal-bar success">✓ Kezelési terv sikeresen mentve.</div>
+        <div class="modal-bar error">✕ Hiba történt a mentés során. Kérjük próbálja újra.</div>
+        <div class="modal-bar warning">⚠ Figyelem: a páciens allergiás jodocainre.</div>
+        <div class="modal-bar info">ℹ Új röntgenfelvétel feltöltve a pácienshez.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PANELS ===================== -->
+  <section class="section" id="panels">
+    <h2 class="section-title">Panels &amp; Drawers</h2>
+    <p class="section-subtitle">Complex panels from the Figma file — drawers, tabbed panels, and admin views.</p>
+
+    <div class="swatch-group">
+      <h3>Drawers</h3>
+      <div class="panel-list">
+        <div class="panel-card">
+          <h4>Patients Master Drawer</h4>
+          <span class="panel-type">COMPONENT_SET</span>
+          <span class="figma-ref">166:1064</span>
+        </div>
+        <div class="panel-card">
+          <h4>Treatment Plan Master Drawer</h4>
+          <span class="panel-type">COMPONENT_SET</span>
+          <span class="figma-ref">174:3609</span>
+        </div>
+        <div class="panel-card">
+          <h4>Treatment Detail Drawer</h4>
+          <span class="panel-type">COMPONENT_SET</span>
+          <span class="figma-ref">327:1131</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="swatch-group">
+      <h3>Tabbed Panels</h3>
+      <div class="panel-list">
+        <div class="panel-card">
+          <h4>Status Panel — Feltöltött</h4>
+          <span class="panel-type">COMPONENT_SET</span>
+          <span class="figma-ref">265:1109</span>
+        </div>
+        <div class="panel-card">
+          <h4>Röntgen Panel</h4>
+          <span class="panel-type">COMPONENT_SET</span>
+          <span class="figma-ref">271:4078</span>
+        </div>
+        <div class="panel-card">
+          <h4>Anamnézis Panel</h4>
+          <span class="panel-type">COMPONENT_SET</span>
+          <span class="figma-ref">272:4126</span>
+        </div>
+        <div class="panel-card">
+          <h4>Megjegyzések Panel</h4>
+          <span class="panel-type">COMPONENT_SET</span>
+          <span class="figma-ref">275:1164</span>
+        </div>
+        <div class="panel-card">
+          <h4>Ajánlatok Panel</h4>
+          <span class="panel-type">COMPONENT_SET</span>
+          <span class="figma-ref">292:4058</span>
+        </div>
+        <div class="panel-card">
+          <h4>Status Panel — Voxis</h4>
+          <span class="panel-type">COMPONENT_SET</span>
+          <span class="figma-ref">306:1302</span>
+        </div>
+        <div class="panel-card">
+          <h4>Voice Recording — Kezelési terv</h4>
+          <span class="panel-type">COMPONENT_SET</span>
+          <span class="figma-ref">306:1349</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="swatch-group">
+      <h3>Other</h3>
+      <div class="panel-list">
+        <div class="panel-card">
+          <h4>Admin Frame</h4>
+          <span class="panel-type">COMPONENT</span>
+          <span class="figma-ref">275:4767</span>
+        </div>
+        <div class="panel-card">
+          <h4>Notification Modals</h4>
+          <span class="panel-type">FRAME</span>
+          <span class="figma-ref">220:810</span>
+        </div>
+        <div class="panel-card">
+          <h4>Beviteli mód / Státusz</h4>
+          <span class="panel-type">COMPONENT</span>
+          <span class="figma-ref">307:780</span>
+        </div>
+        <div class="panel-card">
+          <h4>Dropdown — Kezelés</h4>
+          <span class="panel-type">FRAME</span>
+          <span class="figma-ref">323:554</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DRAWER: PATIENTS ===================== -->
+  <!-- Figma: node 155:1033 (Property 1=Default) 600x1089 -->
+  <section class="section" id="patients">
+    <h2 class="section-title">Patients Master Drawer</h2>
+    <p class="section-subtitle">Vizit gyorsnézet — quick visit overview. Figma node 166:1064, variant Property
+      1=Default.</p>
+    <div class="drawer-showcase">
+      <div class="figma-panel">
+        <div class="figma-panel-header"><span class="figma-badge">Figma Design</span><span
+            class="figma-ref">155:1033</span></div>
+        <img src="images/patients_drawer.png" alt="Patients Master Drawer" class="figma-img">
+      </div>
+      <div class="drawer-panel">
+        <div class="figma-panel-header"><span class="figma-badge html-badge">HTML Recreation</span></div>
+        <!-- Figma: 600w, cornerRadius=20, bg=#FFF, padding=30/30/20/20 -->
+        <div class="drawer" style="width:540px">
+          <!-- Header: 12px/w400 #5F7D95 -->
+          <div class="drawer-header">
+            <span class="drawer-title-sm">Vizit gyorsnézet</span>
+            <button class="drawer-close">✕</button>
+          </div>
+          <!-- Patient: name 22px/w700 #C43284; meta 12px/w400 #5F7D95 -->
+          <h2 class="drawer-patient-name">Stefánsdóttir, Gudrun Hrönn</h2>
+          <p class="drawer-patient-meta">ID: #223456789 • Nő, 65 éves</p>
+
+          <!-- Previous appointments chips: r=4, border=#BFC8CE, 12px/w500 -->
+          <div class="drawer-section">
+            <h4 class="drawer-section-title">Korábbi időpontok</h4>
+            <div class="chip-row">
+              <span class="chip">2026. Jan. 11. (Sze) 11:00</span>
+              <span class="chip">2025. Dec. 15. (Hé) 09:30</span>
+            </div>
+            <a class="drawer-link" href="#">Összes megtekintése</a>
+          </div>
+
+          <!-- Status pills: r=4, border=#BFC8CE; active: border=#C43284, bg=#FFF1F9 -->
+          <div class="drawer-section">
+            <h4 class="drawer-section-title">Aktuális vizit <span class="icon-reload">⟳</span></h4>
+            <div class="status-pills">
+              <span class="pill pill-active">Megérkezett</span>
+              <span class="pill">Elkezdve</span>
+              <span class="pill">Lezárva</span>
+              <span class="pill">Lemondva</span>
+              <span class="pill">No-show</span>
+            </div>
+          </div>
+
+          <!-- Visit card: r=15, gradient fill 0.5 opacity, shadow 0 1px 4px rgba(0,0,0,0.15)
+               Date: 16px/w500; Type: 14px/w600 #C43284; Ref: 14px/w400 #186D98
+               Desc: 14px/w400; Doctor: 14px/w300; Meta: 12px/w400 -->
+          <div class="visit-card">
+            <div class="visit-card-header">
+              <span class="visit-card-date">📅 2026. május 5. (P), 10:00</span>
+              <button class="btn-icon">✎</button>
+            </div>
+            <div class="visit-card-body">
+              <div class="visit-row">
+                <span class="visit-type">Átadás</span>
+                <span class="visit-ref">#137425897492</span>
+              </div>
+              <p class="visit-desc">Full cirkon híd All-on-4-ra</p>
+              <p class="visit-doctor">Dr. Harmathy Béla</p>
+              <div class="visit-meta-row">
+                <span>🕐 120 perc</span>
+                <span>🏠 3-as rendelő</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comment box: r=10, border=#D9D9D9, padding=10/20
+               Avatar: 40x40 circle, stroke=#FFF 4px, drop-shadow -->
+          <div class="comment-box">
+            <div class="comment-avatar">
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23ED51A8'/%3E%3Ctext x='20' y='25' text-anchor='middle' fill='white' font-size='14' font-family='Inter'%3EGH%3C/text%3E%3C/svg%3E"
+                alt="">
+            </div>
+            <span class="comment-placeholder">Megjegyzés</span>
+            <button class="btn-send">➤</button>
+          </div>
+
+          <!-- Comment block: bg=#F5F5F5, r=10, padding=20/20/10/15 -->
+          <div class="tl-comment" style="margin-bottom:16px">
+            <div class="tl-comment-avatar">
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%2362A9CD'/%3E%3Ctext x='20' y='25' text-anchor='middle' fill='white' font-size='13' font-family='Inter'%3EFB%3C/text%3E%3C/svg%3E"
+                alt="">
+            </div>
+            <div>
+              <div class="tl-comment-meta">Faragó Brigitta<br><span>2026. 01. 15. (Hé) 14:53</span></div>
+              <p class="tl-comment-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed luctus venenatis
+                malesuada. Vivamus sed dolor mperdiet, cursus erat et, interdum felis.</p>
+            </div>
+          </div>
+
+          <div style="font-size:12px;font-weight:500;color:#186D98;margin-bottom:16px;cursor:pointer">Több megjegyzés ›
+          </div>
+
+          <!-- Payment: title 14px/w600; amount text 20px/w700 #082432 -->
+          <div class="drawer-section">
+            <h4 class="drawer-section-title">Aktuális fizetendő</h4>
+            <div class="payment-row">
+              <span class="payment-desc">Full kontúr cirkon híd</span>
+              <span class="payment-amount">1 210 000 Ft</span>
+            </div>
+          </div>
+
+          <!-- CTA: r=15, bg=#C43284, 16px/w600 #FFF -->
+          <button class="drawer-cta">Ugrás fizetésre</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DRAWER: TREATMENT PLAN ===================== -->
+  <!-- Figma: node 166:1065 (State=Default) 500x940 -->
+  <section class="section" id="treatment-plan">
+    <h2 class="section-title">Treatment Plan Master Drawer</h2>
+    <p class="section-subtitle">Ajánlat gyorsnézet — offer/quote overview. Figma node 174:3609, variant State=Default.
+    </p>
+    <div class="drawer-showcase">
+      <div class="figma-panel">
+        <div class="figma-panel-header"><span class="figma-badge">Figma Design</span><span
+            class="figma-ref">166:1065</span></div>
+        <img src="images/treatment_plan_drawer.png" alt="Treatment Plan Master Drawer" class="figma-img">
+      </div>
+      <div class="drawer-panel">
+        <div class="figma-panel-header"><span class="figma-badge html-badge">HTML Recreation</span></div>
+        <div class="drawer" style="width:440px">
+          <div class="drawer-header">
+            <span class="drawer-title-sm">Ajánlat gyorsnézet</span>
+            <button class="drawer-close">✕</button>
+          </div>
+
+          <!-- Offer header: ID 22px/w700 #186D98, subject 14px/w500 #C43284
+               Patient 14px/w600 #186D98, border-bottom: dashed 1px #BFC8CE -->
+          <div class="offer-header">
+            <div>
+              <h2 class="offer-id">#13883239299</h2>
+              <p class="offer-subject">Tárgy: All-on-4</p>
+            </div>
+            <div class="offer-patient">
+              <span class="offer-patient-name">Bíró János Attila</span>
+              <span class="offer-patient-id">ID #: 223456789</span>
+            </div>
+          </div>
+
+          <!-- Meta: 11px/w400 #5F7D95, border-bottom: 1px solid #ECECEC -->
+          <div class="offer-meta">
+            <div class="offer-meta-left">
+              <div>Verziószám: v.1</div>
+              <div>Létrehozta: Dr. Teszt Fogorvos</div>
+              <div>Dátum: 2026. január 16., 12:31</div>
+            </div>
+            <div class="offer-meta-right">
+              <div>49 éves, 1977. 08. 14.</div>
+              <div>TAJ: 168 634 123</div>
+              <div>Egészségbizt: magán</div>
+            </div>
+          </div>
+
+          <!-- Status: badge r=8 bg=#32B000 12px/w500 -->
+          <div class="drawer-section">
+            <h4 class="drawer-section-title">Ajánlat státusza</h4>
+            <div class="status-update">
+              <div class="status-info">
+                <span>Utolsó módosítás:</span><br>
+                <span>2026. 01 16. 12:31, Dr. Harmathy Béla</span>
+              </div>
+              <span class="status-badge-accepted">ELFOGADVA ▾</span>
+            </div>
+          </div>
+
+          <!-- Progress bar: track bg=#ECECEC, fill gradient -->
+          <div class="drawer-section">
+            <div class="progress-row">
+              <span class="drawer-section-title" style="margin-bottom:0">Kezelés készültsége</span>
+              <span class="progress-pct">50%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width:50%"></div>
+            </div>
+          </div>
+
+          <!-- Visit 2: r=15, border-left 3px #186D98 -->
+          <div class="visit-card visit-card-blue">
+            <div class="visit-card-header">
+              <span>⊕ <span class="visit-label-green">2. VIZIT</span></span>
+              <span style="text-align:right">🔄 2026. 05. 05. 10:00<br>Dr. Kiss Barbara</span>
+            </div>
+            <div class="visit-card-body">
+              <div class="treatment-line"><span>Digitális lenyomatvétel</span><span>Teljes szájüreg</span></div>
+              <div class="treatment-line"><span>Felépítmény, Dynamic Abutment</span><span>x4</span></div>
+              <div class="treatment-line"><span>Full kontúr cirkon híd All-on-4-ra</span><span>x4</span></div>
+              <div class="treatment-line"><span>Rögzítés, végleges</span><span>x4</span></div>
+              <div class="treatment-line"><span>Harapásemelő</span><span></span></div>
+              <!-- Amount badge: r=50, bg=#C43284, 12px/w500 #FFF -->
+              <div class="treatment-line treatment-total"><span>FIZETENDŐ</span><span class="amount-badge">1 210 000
+                  Ft</span></div>
+            </div>
+          </div>
+
+          <!-- Visit 1: r=15, border-left 3px #32B000 -->
+          <div class="visit-card visit-card-green">
+            <div class="visit-card-header">
+              <span>✓ <span class="visit-label-green">1. VIZIT</span></span>
+              <span style="text-align:right">2026. 01. 29. 14:45<br>Dr. Harmathy Béla</span>
+            </div>
+            <div class="visit-card-body">
+              <div class="treatment-line"><span>CT 8×15</span><span>Teljes szájüreg</span></div>
+              <div class="treatment-line"><span>Érzéstelenítés</span><span>x4</span></div>
+              <div class="treatment-line"><span>Nobel Replace CC implantátum</span><span>x4</span></div>
+              <div class="treatment-line"><span>Nobel BioCare Multiunit felépítmény</span><span>x4</span></div>
+              <div class="treatment-line"><span>Ideiglenes híd All-on-4-ra</span><span></span></div>
+              <!-- Paid: r=50, bg=#32B000 -->
+              <div class="treatment-line treatment-total"><span>FIZETVE</span><span class="amount-badge amount-paid">1
+                  725 500 Ft</span></div>
+            </div>
+          </div>
+
+          <!-- Total: 14px/w600; amount 22px/w700 -->
+          <div class="total-row">
+            <span>Kezelés összesen</span>
+            <span class="total-amount">3 675 000 Ft</span>
+          </div>
+          <button class="drawer-cta">Ugrás kezelésre</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DRAWER: TREATMENT DETAIL ===================== -->
+  <!-- Figma: node 327:1132 (State=Default) 600x1128 -->
+  <section class="section" id="treatment-detail">
+    <h2 class="section-title">Treatment Detail Drawer</h2>
+    <p class="section-subtitle">Kezelés gyorsnézet — treatment history timeline. Figma node 327:1131, variant
+      State=Default.</p>
+    <div class="drawer-showcase">
+      <div class="figma-panel">
+        <div class="figma-panel-header"><span class="figma-badge">Figma Design</span><span
+            class="figma-ref">327:1132</span></div>
+        <img src="images/treatment_detail_drawer.png" alt="Treatment Detail Drawer" class="figma-img">
+      </div>
+      <div class="drawer-panel">
+        <div class="figma-panel-header"><span class="figma-badge html-badge">HTML Recreation</span></div>
+        <div class="drawer" style="width:540px">
+          <div class="drawer-header">
+            <span class="drawer-title-sm">Kezelés gyorsnézet</span>
+            <button class="drawer-close">✕</button>
+          </div>
+
+          <!-- Patient header: name 22px/w700 #C43284; meta 12px/w400 #5F7D95
+               IDs: 12px/w400 #5F7D95 text-align:right -->
+          <div class="detail-patient-header">
+            <div>
+              <h2 class="drawer-patient-name">Bíró János Attila</h2>
+              <p class="drawer-patient-meta">1968. 08. 14., 54 éves</p>
+            </div>
+            <div class="detail-ids">
+              <span>ID #: 223456789</span>
+              <span>TAJ: 168 634 123</span>
+            </div>
+          </div>
+
+          <!-- Discount/tags: empty state -->
+          <div class="drawer-section">
+            <div class="detail-meta-row">
+              <span class="drawer-section-title" style="margin-bottom:0">Kedvezmény / címkék</span>
+              <span class="detail-none"><em>nincs</em></span>
+            </div>
+          </div>
+
+          <!-- Document chips: r=50, various bg colors, 12px/w500 -->
+          <div class="drawer-section">
+            <h4 class="drawer-section-title">Dokumentumok</h4>
+            <div class="doc-chips">
+              <span class="doc-chip doc-chip-blue">Páciensdokumentáció</span>
+              <span class="doc-chip doc-chip-green">Receptek</span>
+              <span class="doc-chip doc-chip-yellow">Beutalók</span>
+              <span class="doc-chip doc-chip-pink">Ambulánslapok</span>
+            </div>
+          </div>
+
+          <hr class="tl-separator">
+
+          <!-- Timeline: vertical dashed line #5F7D95 dashes=2,2; dots 10x10 #082432 -->
+          <div class="drawer-section">
+            <h4 class="drawer-section-title">Előzmények</h4>
+
+            <!-- Entry 1: JAN 27 -->
+            <div class="timeline">
+              <div class="timeline-date">
+                <span class="tl-date">JAN. 27.</span>
+                <span class="tl-time">(Ke) 14:00</span>
+              </div>
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <!-- Card: r=15, border=dashed 1px #BFC8CE, padding=10/20 -->
+                <div class="tl-card">
+                  <div class="tl-header">
+                    <div>
+                      <span class="tl-type tl-type-pink">All-on-4 műtét</span>
+                      <span class="tl-ref">#13883239299 (2/1 vizit)</span>
+                    </div>
+                    <div class="tl-doctor">
+                      <span>Dr. Harmathy Béla</span>
+                      <span class="tl-assistant">Asszisztens: Németh Lilla</span>
+                    </div>
+                  </div>
+                  <!-- Procedures: bg=#F5F5F5, r=10, 12px/w400 #5F7D95 -->
+                  <div class="tl-procedures">CT 8×15 / Érzéstelenítés / Nobel Replace CC implantátum / Nobel BioCare
+                    Multiunit felépítmény / Ideiglenes híd All-on-4-ra / Harapásemelő</div>
+                  <!-- Comment: bg=#F5F5F5, r=10 -->
+                  <div class="tl-comment">
+                    <div class="tl-comment-avatar">
+                      <img
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%2362A9CD'/%3E%3Ctext x='20' y='25' text-anchor='middle' fill='white' font-size='13' font-family='Inter'%3EHB%3C/text%3E%3C/svg%3E"
+                        alt="">
+                    </div>
+                    <div>
+                      <div class="tl-comment-meta">Dr. Harmathy Béla<br><span>2026. 01. 15. (Hé) 14:53</span></div>
+                      <p class="tl-comment-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed luctus
+                        venenatis malesuada. Vivamus sed dolor mperdiet, cursus erat et, interdum felis.</p>
+                    </div>
+                  </div>
+                  <!-- Docs: 12px/w500 #186D98 -->
+                  <div class="tl-docs">
+                    <span class="tl-doc">📋 Recept (Augmentin DUO 625 mg)</span>
+                    <span class="tl-doc">💊 Gyógyszercsomag (1db)</span>
+                    <span class="tl-doc">📄 Ambulánslap</span>
+                  </div>
+                  <!-- Cost: 12px/w600; badge r=50 bg=#C43284 -->
+                  <div class="tl-cost-row">
+                    <span>Vizit díja összesen:</span>
+                    <span class="amount-badge">750 000 Ft</span>
+                  </div>
+                  <div class="tl-cost-row tl-cost-sub">
+                    <span>Kezelési terv értéke</span>
+                    <span>3 670 000 Ft</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Entry 2: JAN 15 -->
+            <div class="timeline">
+              <div class="timeline-date">
+                <span class="tl-date">JAN. 15.</span>
+                <span class="tl-time">(Ke) 14:00</span>
+              </div>
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <div class="tl-card">
+                  <div class="tl-header">
+                    <div>
+                      <span class="tl-type tl-type-yellow">Konzultáció</span>
+                      <span class="tl-ref">#13883239298</span>
+                    </div>
+                    <div class="tl-doctor">
+                      <span>Dr. Harmathy Béla</span>
+                      <span class="tl-assistant">Asszisztens: Németh Lilla</span>
+                    </div>
+                  </div>
+                  <div class="tl-procedures">Panoráma röntgen / Szájvizsgálat, állapotfelmérés</div>
+                  <div class="tl-comment">
+                    <div class="tl-comment-avatar">
+                      <img
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%2362A9CD'/%3E%3Ctext x='20' y='25' text-anchor='middle' fill='white' font-size='13' font-family='Inter'%3EHB%3C/text%3E%3C/svg%3E"
+                        alt="">
+                    </div>
+                    <div>
+                      <div class="tl-comment-meta">Dr. Harmathy Béla<br><span>2026. 01. 15. (Hé) 14:53</span></div>
+                      <p class="tl-comment-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                    </div>
+                  </div>
+                  <div class="tl-docs">
+                    <span class="tl-doc">📄 Ambulánslap beküldve</span>
+                  </div>
+                  <!-- Paid: badge r=50 bg=#32B000 -->
+                  <div class="tl-cost-row">
+                    <span>Vizit díja összesen:</span>
+                    <span class="amount-badge amount-paid">33 000 Ft</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>EasyMed Design System &middot; Built from <strong>UI KIT_eaisymed</strong> Figma file &middot; Last synced: March
+      2026</p>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Copied!</div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
