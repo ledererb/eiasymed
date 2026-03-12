@@ -1,0 +1,124 @@
+/* ============================================================
+   eaisy Design System — Tokens
+   Extracted from Figma: Tokens (Colour/Typo/Effects) page
+   ============================================================ */
+
+:root {
+  /* ─── WHITE ─── */
+  --color-white: #FFFFFF;
+
+  /* ─── NEUTRAL (6) ─── */
+  --color-neutral-50: #F5F5F5;   /* Base / page background */
+  --color-neutral-100: #EDEDED;  /* Divider lines */
+  --color-neutral-200: #D9D9D9;  /* Input borders, disabled bg */
+  --color-neutral-400: #CFCFCF;  /* Inactive / Nem elérhető */
+  --color-neutral-500: #BFC9CF;  /* Frame borders */
+  --color-neutral-600: #5F7D95;  /* Placeholder text, secondary text */
+
+  /* ─── PRIMARY (6) ─── */
+  --color-primary-50: #DFFFFD;   /* Badge bg (turquoise tint) */
+  --color-primary-100: #90FFF8;  /* Teal highlight */
+  --color-primary-200: #1CEEE0;  /* Active tab underline */
+  --color-primary-400: #62AACE;  /* Mid-tone links/icons */
+  --color-primary-500: #186D98;  /* Badge text, links, accents */
+  --color-primary-900: #082432;  /* Buttons bg, dark nav, headings */
+
+  /* ─── BRAND (4) ─── */
+  --color-brand-50: #FFF1F9;     /* Calendar magenta bg */
+  --color-brand-400: #ED51A8;    /* Accent pink */
+  --color-brand-500: #C43284;    /* Outline buttons, brand accent */
+  --color-brand-600: #A2005B;    /* Dark brand text */
+
+  /* ─── STATUS (9) ─── */
+  --color-status-alert: #FF0000;      /* Függőben / Pending (red) */
+  --color-status-success: #32B100;    /* Folyamatban / In progress (green) */
+  --color-status-new: #60C5FF;        /* Új érdeklődő / New lead (light blue) */
+  --color-status-offer: #FF9D00;      /* Ajánlata van / Offer (orange) */
+  --color-status-consultation: #FFCE49; /* Konzultáció (yellow) */
+  --color-status-completed: #1C6100;  /* Befejezett (dark green) */
+  --color-status-waiting: #E696FF;    /* Várakozik (purple) */
+  --color-status-rejected: #9D9D9D;   /* Elutasítva (gray) */
+  --color-status-inactive: #000000;   /* Inaktív (black) */
+
+  /* ─── CALENDAR (11) ─── */
+  --color-cal-yellow: #FFF4D7;
+  --color-cal-orange: #FFD592;
+  --color-cal-red: #FFD5E0;
+  --color-cal-lilac: #FCF1FF;
+  --color-cal-green: #EFFCEA;
+  --color-cal-lime-green: #E6FFBE;
+  --color-cal-mint: #CBFFE9;
+  --color-cal-dark-mint: #00D599;
+  --color-cal-turquoise: #00BDB3;
+  --color-cal-blue: #CAEBFF;
+  --color-cal-gray-green: #ADD9D6;
+
+  /* ─── RADII ─── */
+  --radius-button: 10px;
+  --radius-input: 8px;
+  --radius-badge: 50px;
+  --radius-card: 10px;
+  --radius-badge-sm: 40px;
+
+  /* ─── SHADOWS ─── */
+  --shadow-50: 0px 1px 4px 0px rgba(0, 0, 0, 0.15);
+  --shadow-100: 2px 4px 20px 0px rgba(0, 0, 0, 0.25);
+  --shadow-200: 0px 0px 15px 0px rgba(0, 0, 0, 0.25);
+  --shadow-300: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
+  --shadow-brand-glow: 2px 1px 10px 1px rgba(196, 50, 132, 0.8);
+
+  /* ─── STROKES ─── */
+  --stroke-primary: #082432;
+  --stroke-neutral-200: #D9D9D9;
+  --stroke-neutral-100: #EDEDED;
+  --stroke-brand-500: #C43284;
+  --stroke-brand-400: #ED51A8;
+  --stroke-brand-50: #FFF1F9;
+
+  /* ─── GRADIENTS ─── */
+  --gradient-light-blue: linear-gradient(221.6deg, #FFFFFF 28%, #DFFFFD 22%, #B8FBF6 114%);
+  --gradient-dark-blue: linear-gradient(221.6deg, #186D98 28%, #62AACE 22%, #1CEEE0 114%);
+  --gradient-dark-pink: linear-gradient(221deg, #A2005B 3%, #FF74C2 70%, #FFCFEA 105%);
+  --gradient-light-mixed: linear-gradient(237.3deg, rgba(192,251,250,0.5) 8%, rgba(255,241,249,0.5) 64%, rgba(255,229,244,0.5) 115%);
+  --gradient-dark-mixed: linear-gradient(241.3deg, rgba(144,255,248,0.5) 19%, rgba(191,168,208,0.5) 51%, rgba(237,81,168,0.5) 83%);
+  --gradient-base-1: linear-gradient(189.7deg, rgba(255,255,255,0.5) 33%, rgba(223,255,253,0.5) 72%, rgba(246,190,221,0.5) 103%);
+  --gradient-base-2: linear-gradient(195.5deg, rgba(255,255,255,0.5) 31%, rgba(255,241,249,0.5) 65%, rgba(144,255,248,0.5) 99%);
+  --gradient-base-3: linear-gradient(189.7deg, rgba(255,255,255,0.5) 33%, rgba(255,255,255,0.5) 72%, rgba(220,255,253,0.5) 88%, rgba(246,190,221,0.5) 115%);
+
+  /* ─── TYPOGRAPHY ─── */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Sizes */
+  --font-size-8: 8px;
+  --font-size-10: 10px;
+  --font-size-12: 12px;
+  --font-size-14: 14px;
+  --font-size-16: 16px;
+  --font-size-20: 20px;
+  --font-size-24: 24px;
+
+  /* Weights */
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ─── SPACING ─── */
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-5: 5px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-15: 15px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+
+  /* ─── TRANSITIONS ─── */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}

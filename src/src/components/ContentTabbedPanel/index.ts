@@ -1,0 +1,1 @@
+export { ContentTabbedPanel } from './ContentTabbedPanel';

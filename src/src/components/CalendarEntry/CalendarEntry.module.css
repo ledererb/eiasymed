@@ -1,0 +1,36 @@
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 10px;
+  border-radius: var(--radius-card);
+  width: 123px;
+  min-height: 106px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+.time { font-size: var(--font-size-12); font-weight: var(--font-weight-regular); }
+.patient { font-size: var(--font-size-14); font-weight: var(--font-weight-semibold); }
+.doctor { font-size: var(--font-size-12); font-weight: var(--font-weight-regular); }
+.category { display: inline-flex; align-items: center; padding: 2px 5px; border-radius: var(--radius-badge-sm); background: var(--color-status-rejected); color: var(--color-white); font-size: var(--font-size-8); width: fit-content; margin-top: auto; }
+
+/* Colors - left border accent + light bg */
+.yellow { background: var(--color-cal-yellow); box-shadow: -5px 0 0 0 #FFCE49; color: #B8860B; }
+.orange { background: var(--color-cal-orange); box-shadow: -5px 0 0 0 var(--color-status-offer); color: #CC7A00; }
+.red { background: var(--color-cal-red); box-shadow: -5px 0 0 0 var(--color-status-alert); color: #CC0000; }
+.lilac { background: var(--color-cal-lilac); box-shadow: -5px 0 0 0 var(--color-status-waiting); color: #8E24AA; }
+.green { background: var(--color-cal-green); box-shadow: -5px 0 0 0 var(--color-status-success); color: #2E7D32; }
+.limeGreen { background: var(--color-cal-lime-green); box-shadow: -5px 0 0 0 #8BC34A; color: #558B2F; }
+.mint { background: var(--color-cal-mint); box-shadow: -5px 0 0 0 var(--color-cal-dark-mint); color: #00695C; }
+.darkMint { background: var(--color-cal-dark-mint); box-shadow: -5px 0 0 0 #009688; color: var(--color-white); }
+.turquoise { background: var(--color-cal-turquoise); box-shadow: -5px 0 0 0 #00897B; color: var(--color-white); }
+.blue { background: var(--color-cal-blue); box-shadow: -5px 0 0 0 #2196F3; color: #1565C0; }
+.grayGreen { background: var(--color-cal-gray-green); box-shadow: -5px 0 0 0 #78909C; color: #37474F; }
+.magenta { background: var(--color-brand-50); box-shadow: -5px 0 0 0 var(--color-brand-500); color: var(--color-brand-500); }
+.gray { background: var(--color-neutral-50); box-shadow: -5px 0 0 0 var(--color-neutral-400); color: var(--color-neutral-600); }
+
+/* States */
+.pressed { transform: scale(0.98); box-shadow: var(--shadow-300); font-weight: var(--font-weight-semibold); }
+.unconfirmed { opacity: 0.6; border: 1px dashed currentColor; }

@@ -1,0 +1,10 @@
+.tabs { display: inline-flex; align-items: center; gap: 0; border-radius: var(--radius-input); overflow: hidden; }
+.tab { display: flex; align-items: center; justify-content: center; padding: 10px 16px; height: 36px; border: none; cursor: pointer; font-family: var(--font-family); font-size: var(--font-size-12); font-weight: var(--font-weight-medium); transition: all var(--transition-fast); position: relative; }
+/* Light */
+.light .tab { background: var(--color-white); color: var(--color-primary-900); border-bottom: 2px solid transparent; }
+.light .tab:hover { color: var(--color-primary-200); border-bottom-color: var(--color-primary-200); }
+.light .active { color: var(--color-primary-200); border-bottom-color: var(--color-primary-200); }
+/* Dark */
+.dark .tab { background: var(--color-primary-900); color: var(--color-neutral-500); border-bottom: 2px solid transparent; }
+.dark .tab:hover { color: var(--color-primary-200); border-bottom-color: var(--color-primary-200); }
+.dark .active { color: var(--color-primary-200); border-bottom-color: var(--color-primary-200); }

@@ -1,0 +1,33 @@
+.row { display: flex; align-items: center; gap: var(--space-12); padding: 10px 16px; border-bottom: 1px solid var(--color-neutral-100); font-family: var(--font-family); font-size: var(--font-size-14); min-height: 44px; }
+.label { flex: 1; color: var(--color-primary-900); }
+.secondary { color: var(--color-neutral-600); font-size: var(--font-size-12); }
+.amount { font-weight: var(--font-weight-semibold); color: var(--color-primary-900); white-space: nowrap; }
+.badge { flex-shrink: 0; }
+.actions { display: flex; gap: var(--space-8); margin-left: auto; }
+
+/* Header row */
+.header { background: var(--color-brand-500); color: var(--color-white); border-radius: var(--radius-input) var(--radius-input) 0 0; border-bottom: none; }
+.header .label { color: var(--color-white); font-weight: var(--font-weight-semibold); }
+.header .amount { color: var(--color-white); }
+
+/* Edit / Done rows */
+.row_edit { border: 1px dashed var(--color-neutral-200); border-bottom: 1px dashed var(--color-neutral-200); }
+.row_done { border: 1px solid var(--color-neutral-100); }
+
+/* Dividers */
+.divider_open, .divider_closed, .divider_start_visit, .divider_start_consultation, .divider_close_visit, .divider_visit_sum, .divider_save, .divider_saved {
+  border: 1px dashed var(--color-brand-400); border-bottom: 1px dashed var(--color-brand-400); background: var(--color-white); padding: 8px 16px; min-height: 36px; font-size: var(--font-size-12); color: var(--color-brand-500); font-weight: var(--font-weight-medium);
+}
+.divider_visit_sum { background: var(--color-brand-50); }
+.divider_save .amount, .divider_saved .amount { padding: 4px 12px; border-radius: var(--radius-button); }
+.divider_save .amount { background: var(--color-brand-500); color: var(--color-white); cursor: pointer; }
+.divider_saved .amount { background: var(--color-status-success); color: var(--color-white); }
+
+/* Duration / Add */
+.duration { font-size: var(--font-size-12); color: var(--color-neutral-600); }
+.add_treatment { color: var(--color-primary-200); font-size: var(--font-size-12); cursor: pointer; }
+.add_treatment:hover { color: var(--color-primary-500); }
+
+/* Document */
+.document_alert { border-left: 3px solid var(--color-status-alert); }
+.document_signed { border-left: 3px solid var(--color-status-success); }

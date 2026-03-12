@@ -1,0 +1,100 @@
+/* Voice Recording Bar — kezelési terv */
+.wrapper {
+  width: 710px;
+  background: var(--color-white);
+  padding: 27px 16px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 100px;
+  border-radius: 80px;
+  border: 1px solid var(--color-brand-400);
+  background: linear-gradient(205deg, rgba(192,251,250,0.5) 8%, rgba(255,241,249,0.5) 64%, rgba(255,229,244,0.5) 100%);
+  overflow: hidden;
+  padding-right: 27px;
+}
+
+/* Gradient mic circle */
+.micCircle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(240deg, #A2005B 3%, #FF74C2 70%, #FFCFEA 105%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+}
+.micInner {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.micCircle svg {
+  color: var(--color-white);
+}
+
+/* Waveform area */
+.waveform {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.waveBar {
+  width: 2px;
+  border-radius: 1px;
+  background: var(--color-primary-900);
+  opacity: 0.5;
+}
+
+/* Status text + timer */
+.statusText {
+  font-family: var(--font-family);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary-900);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.timer {
+  font-family: var(--font-family);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary-900);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Control icon buttons (Pause / Stop) */
+.controlBtn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--color-primary-900);
+  transition: background var(--transition-fast);
+}
+.controlBtn:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+/* Spacer to push controls right */
+.spacer {
+  flex: 1;
+}

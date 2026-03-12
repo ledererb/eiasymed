@@ -1,0 +1,9 @@
+.iconButton { display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; border-radius: 50%; cursor: pointer; color: var(--color-primary-500); transition: all var(--transition-fast); }
+.sm { width: 24px; height: 24px; }
+.md { width: 36px; height: 36px; }
+.lg { width: 48px; height: 48px; }
+.iconButton:hover { color: var(--color-primary-200); background: var(--color-primary-50); }
+.iconButton:active { color: var(--color-brand-500); background: var(--color-brand-50); }
+.filled { background: var(--color-primary-50); color: var(--color-primary-500); }
+.filled:hover { background: var(--color-primary-200); color: var(--color-white); }
+.filled:active { background: var(--color-brand-500); color: var(--color-white); }

@@ -1,0 +1,51 @@
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: 5px 12px;
+  border-radius: var(--radius-badge);
+  font-family: var(--font-family);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white);
+  white-space: nowrap;
+  line-height: 1;
+  height: 28px;
+  cursor: default;
+}
+.statusBadge.hasDropdown { cursor: pointer; }
+.dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.chevron { display: inline-flex; align-items: center; margin-left: auto; }
+
+/* Status colors */
+.alert { background-color: var(--color-status-alert); }
+.success { background-color: var(--color-status-success); }
+.new { background-color: var(--color-status-new); }
+.offer { background-color: var(--color-status-offer); }
+.consultation { background-color: var(--color-status-consultation); color: var(--color-primary-900); }
+.completed { background-color: var(--color-status-completed); }
+.waiting { background-color: var(--color-status-waiting); }
+.rejected { background-color: var(--color-status-rejected); }
+.inactive { background-color: var(--color-status-inactive); }
+
+/* Dot-only variant (for legends) */
+.dotOnly {
+  background: transparent;
+  color: var(--color-primary-900);
+  padding: 0;
+  gap: var(--space-8);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-12);
+}
+.dotOnly .dot { width: 10px; height: 10px; }
+.dotAlert { background-color: var(--color-status-alert); }
+.dotSuccess { background-color: var(--color-status-success); }
+.dotNew { background-color: var(--color-status-new); }
+.dotOffer { background-color: var(--color-status-offer); }
+.dotConsultation { background-color: var(--color-status-consultation); }
+.dotCompleted { background-color: var(--color-status-completed); }
+.dotWaiting { background-color: var(--color-status-waiting); }
+.dotRejected { background-color: var(--color-status-rejected); }
+.dotInactive { background-color: var(--color-status-inactive); }

@@ -1,0 +1,10 @@
+.checkbox { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border: 1px solid var(--color-neutral-200); border-radius: 2px; cursor: pointer; transition: all var(--transition-fast); flex-shrink: 0; background: var(--color-white); }
+.checkbox:hover { border-color: var(--color-primary-500); }
+.checkbox.checked { background-color: var(--color-primary-500); border-color: var(--color-primary-500); }
+.checkbox.checked svg { color: var(--color-white); }
+.dark { border-color: var(--color-primary-900); }
+.dark:hover { border-color: var(--color-primary-200); }
+.dark.checked { background-color: var(--color-primary-900); border-color: var(--color-primary-900); }
+.alert { border-color: var(--color-status-alert); }
+.alert.checked { background-color: var(--color-status-alert); border-color: var(--color-status-alert); }
+.wrapper { display: inline-flex; align-items: center; gap: var(--space-8); cursor: pointer; font-size: var(--font-size-14); }
