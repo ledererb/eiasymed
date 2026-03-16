@@ -1,0 +1,74 @@
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding: 0 30px 0 9px;
+  border-radius: 5px;
+  width: 100%;
+}
+.upcoming {
+  background: transparent;
+}
+.active {
+  background: transparent;
+}
+.completed {
+  background: transparent;
+}
+.left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.label {
+  font-family: var(--font-family);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-500);
+}
+.activeBadge {
+  font-family: var(--font-family);
+  font-size: 9px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white);
+  background: var(--color-success-500);
+  padding: 2px 8px;
+  border-radius: 50px;
+}
+.right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.meta {
+  font-family: var(--font-family);
+  font-size: var(--font-size-10);
+  color: var(--color-neutral-600);
+  white-space: nowrap;
+}
+.actionBtn {
+  font-family: var(--font-family);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-primary-500);
+  background: var(--color-white);
+  border: 1px solid var(--color-primary-500);
+  border-radius: 5px;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+.actionBtn:hover {
+  background: var(--color-primary-50);
+}
+.toggleBtn {
+  background: none;
+  border: none;
+  color: var(--color-primary-500);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+}

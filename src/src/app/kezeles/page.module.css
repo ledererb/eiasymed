@@ -1,0 +1,154 @@
+/* ── Kezelés Module Page Styles ── */
+
+.page {
+  min-height: 100vh;
+  background: var(--color-primary-900);
+  font-family: var(--font-family);
+}
+
+/* Step selector bar (demo only) */
+.stepBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--color-primary-900);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  overflow-x: auto;
+}
+.stepBarLabel {
+  font-family: var(--font-family);
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-600);
+  white-space: nowrap;
+  margin-right: 4px;
+}
+.stepBtn {
+  font-family: var(--font-family);
+  font-size: 10px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-600);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50px;
+  padding: 4px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.stepBtn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+  color: var(--color-white);
+}
+.stepBtnActive {
+  background: var(--color-primary-200);
+  border-color: var(--color-primary-200);
+  color: var(--color-primary-900);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Main layout */
+.layout {
+  display: flex;
+  min-height: calc(100vh - 90px);
+}
+
+/* Content area */
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Admin base (rounded bg container) */
+.adminBase {
+  background: var(--color-neutral-50);
+  border-radius: 20px;
+  min-height: calc(100vh - 49px);
+  overflow: hidden;
+  padding-left: 30px;
+}
+
+/* Two-column layout */
+.columns {
+  display: grid;
+  grid-template-columns: 520px 1fr;
+  gap: 0 25px;
+  min-height: calc(100vh - 210px);
+}
+
+/* Left panel */
+.leftPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 0 0 30px 0;
+}
+
+/* Right panel — white card per Figma (bg-white, rounded tl/br, border) */
+.rightPanel {
+  background: var(--color-white);
+  border: 1px solid #d9d9d9;
+  border-radius: 20px 0 0 0;
+  padding: 0 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.rightContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 40px;
+  overflow-y: auto;
+}
+
+/* Anamnézis content */
+.anamnezisContent {
+  padding: 10px 0;
+}
+.anamnezisLegend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-family);
+  font-size: 11px;
+  color: var(--color-primary-900);
+  margin-bottom: 4px;
+}
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.anamnezisLink {
+  font-family: var(--font-family);
+  font-size: var(--font-size-12);
+  color: var(--color-primary-500);
+  margin: 8px 0 12px;
+  cursor: pointer;
+}
+.eaisyBox {
+  background: var(--gradient-light-mixed);
+  border-radius: 10px;
+  padding: 16px;
+}
+.eaisyLabel {
+  font-family: var(--font-family);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-500);
+  display: block;
+  margin-bottom: 8px;
+}
+.eaisyText {
+  font-family: var(--font-family);
+  font-size: var(--font-size-12);
+  color: var(--color-primary-900);
+  line-height: 1.5;
+  margin: 0;
+}

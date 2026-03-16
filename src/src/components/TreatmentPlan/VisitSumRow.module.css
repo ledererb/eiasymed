@@ -1,0 +1,40 @@
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding: 0 30px 0 9px;
+  border-radius: 5px;
+  width: 100%;
+}
+.visit {
+  background: var(--color-neutral-50);
+}
+.total {
+  background: var(--color-neutral-50);
+}
+.label {
+  font-family: var(--font-family);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-500);
+  white-space: nowrap;
+}
+.labelTotal {
+  color: var(--color-primary-500);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
+}
+.badge {
+  font-family: var(--font-family);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
+  background: var(--color-primary-500);
+  padding: 2px 8px;
+  border-radius: 50px;
+  white-space: nowrap;
+}
+.badgeTotal {
+  background: var(--color-brand-500);
+}

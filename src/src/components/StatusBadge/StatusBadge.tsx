@@ -4,7 +4,7 @@ import styles from './StatusBadge.module.css';
 
 export type StatusType =
   | 'alert' | 'success' | 'new' | 'offer' | 'consultation'
-  | 'completed' | 'waiting' | 'rejected' | 'inactive';
+  | 'completed' | 'waiting' | 'rejected' | 'inactive' | 'arrived';
 
 export interface StatusBadgeProps {
   status: StatusType;
@@ -29,6 +29,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
       offer: styles.dotOffer, consultation: styles.dotConsultation,
       completed: styles.dotCompleted, waiting: styles.dotWaiting,
       rejected: styles.dotRejected, inactive: styles.dotInactive,
+      arrived: styles.dotArrived,
     }[status];
 
     return (

@@ -1,0 +1,159 @@
+/* ── Dental Chart Showcase Page Styles ── */
+
+.page {
+  min-height: 100vh;
+  background: var(--gradient-base-3);
+  font-family: var(--font-family);
+}
+
+/* Hero */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 48px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.heroContent {
+  max-width: 560px;
+}
+.heroBadge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-brand-500);
+  background: var(--color-brand-50);
+  padding: 5px 14px;
+  border-radius: 50px;
+  margin-bottom: 16px;
+}
+.heroTitle {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--color-primary-900);
+  line-height: 1.1;
+  margin: 0 0 16px;
+}
+.heroAccent {
+  background: var(--gradient-dark-pink);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.heroDescription {
+  font-size: var(--font-size-16);
+  color: var(--color-neutral-600);
+  margin: 0;
+  line-height: 1.6;
+}
+.heroGraphic {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-light-mixed);
+  border-radius: 50%;
+  box-shadow: var(--shadow-brand-glow);
+  flex-shrink: 0;
+}
+.heroTooth {
+  font-size: 80px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+
+/* Chart Section */
+.chartSection {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 48px 40px;
+}
+
+/* Info cards */
+.info {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 48px 40px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.infoCard {
+  background: var(--color-white);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-50);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.infoCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-100);
+}
+.infoIcon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+.infoTitle {
+  font-size: var(--font-size-14);
+  font-weight: 700;
+  color: var(--color-primary-900);
+  margin: 0 0 8px;
+}
+.infoText {
+  font-size: var(--font-size-12);
+  color: var(--color-neutral-600);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Usage section */
+.usage {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 48px 60px;
+}
+.usageTitle {
+  font-size: var(--font-size-24);
+  font-weight: 700;
+  color: var(--color-primary-900);
+  margin: 0 0 20px;
+}
+.usageSteps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.usageStep {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow-50);
+  font-size: var(--font-size-12);
+  color: var(--color-neutral-600);
+  line-height: 1.5;
+}
+.usageStep strong {
+  color: var(--color-primary-900);
+  display: block;
+  margin-bottom: 2px;
+}
+.usageNum {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--gradient-dark-blue);
+  color: var(--color-white);
+  font-weight: 700;
+  font-size: var(--font-size-14);
+  flex-shrink: 0;
+}

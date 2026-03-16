@@ -1,0 +1,15 @@
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 16px;
+  padding: 0 30px 0 29px;
+  width: 100%;
+}
+.text {
+  font-family: var(--font-family);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-neutral-600);
+  white-space: nowrap;
+}

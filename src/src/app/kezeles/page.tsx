@@ -1,0 +1,307 @@
+'use client';
+
+import React, { useState } from 'react';
+import {
+  Users, CurrencyDollar, Files, ChartBar, Pencil, X,
+} from '@phosphor-icons/react';
+import { TopNav } from '@/components/TopNav';
+import { SideNav } from '@/components/SideNav';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { AdminHeader } from '@/components/AdminHeader';
+import { ContentTabbedPanel } from '@/components/ContentTabbedPanel';
+import { StatusTabbedPanel } from '@/components/StatusTabbedPanel';
+import { TreatmentPlanRow } from '@/components/TreatmentPlanRow';
+import { TreatmentDetailDrawer } from '@/components/Drawer';
+import { VoiceRecordingBar } from '@/components/VoiceRecordingBar';
+import {
+  TPHeader, VisitDivider, VisitSumRow, DocumentRow,
+  AddTreatmentRow, DurationRow, TPStatusHeader, BeviteliMod, SaveTPRow,
+} from '@/components/TreatmentPlan';
+import { Tabs } from '@/components/Tabs';
+import styles from './page.module.css';
+
+type WorkflowStep =
+  | 'consultation_default'
+  | 'consultation_voxis'
+  | 'tp_writing'
+  | 'tp_saved'
+  | 'visit_1'
+  | 'visit_2'
+  | 'visit_2_drawer';
+
+const STEP_LABELS: Record<WorkflowStep, string> = {
+  consultation_default: 'Konzultáció (alap)',
+  consultation_voxis: 'Konzultáció + Voxis',
+  tp_writing: 'KT írás',
+  tp_saved: 'KT mentve',
+  visit_1: '1. vizit',
+  visit_2: '2. vizit',
+  visit_2_drawer: '2. vizit + Drawer',
+};
+
+const STATUS_MAP: Record<WorkflowStep, string> = {
+  consultation_default: 'megérkezett',
+  consultation_voxis: 'konzultáció folyamatban',
+  tp_writing: 'konzultáció folyamatban',
+  tp_saved: 'konzultáció folyamatban',
+  visit_1: 'vizit folyamatban',
+  visit_2: 'vizit folyamatban',
+  visit_2_drawer: 'vizit folyamatban',
+};
+
+const CONSULT_ITEMS = [
+  { name: 'Digitális panorámaröntgen (OPT)', area: 'Teljes szájüreg', price: '12 000 Ft', qty: '× 1', total: '12 000 Ft' },
+  { name: 'Szakorvosi vizsgálat, állapotfelmérés, konzultáció, kezelési terv', area: 'Teljes szájüreg', price: '21 000 Ft', qty: '× 1', total: '21 000 Ft' },
+];
+
+const VISIT1_ITEMS = [
+  { name: 'CT 8×15', area: 'Teljes szájüreg', price: '28 500 Ft', qty: '× 1', total: '28 500 Ft' },
+  { name: 'Helyi érzéstelenítés', area: '12,15,22, 25', price: '2 000 Ft', qty: '× 4', total: '8 000 Ft' },
+  { name: 'Implantáció Nobel Replace CC', area: '12,15,22, 25', price: '230 500 Ft', qty: '× 4', total: '922 000 Ft' },
+  { name: 'Felépítmény NobelBiocare Multi-unit', area: '12,15,22, 25', price: '100 000 Ft', qty: '× 4', total: '400 000 Ft' },
+  { name: 'Ideiglenes híd All-on-4 -ra', area: '23, 12, 13, 14, 15, 11, 25, 24, 21, 22', price: '400 000 Ft', qty: '× 1', total: '400 000 Ft' },
+  { name: 'Harapásemelő sín, fólia', area: 'Felső fogsor', price: '25 000 Ft', qty: '× 1', total: '25 000 Ft' },
+];
+
+const VISIT2_ITEMS = [
+  { name: 'Digitális lenyomatvétel', area: 'Teljes szájüreg', price: '28 000 Ft', qty: '× 1', total: '28 000 Ft' },
+  { name: 'Felépítmény Dynamic Abutment csavarozható', area: '12,15,22, 25', price: '100 000 Ft', qty: '× 4', total: '400 000 Ft' },
+  { name: 'Full kontúr cirkon híd All-on-4-ra', area: '23, 12, 13, 14, 15, 11, 25, 24, 21, 22', price: '1 500 000 Ft', qty: '× 1', total: '1 500 000 Ft' },
+  { name: 'Rögzítés, végleges', area: '12,15,22, 25', price: '5 000 Ft', qty: '× 4', total: '20 000 Ft' },
+  { name: 'Harapásemelő sín, fólia', area: 'Felső fogsor', price: '25 000 Ft', qty: '× 1', total: '25 000 Ft' },
+];
+
+export default function KezelesPage() {
+  const [step, setStep] = useState<WorkflowStep>('consultation_default');
+  const [activeNav, setActiveNav] = useState('biroja');
+  const [activeSide, setActiveSide] = useState('kezeles');
+  const [rightTab, setRightTab] = useState('kezeles');
+  const drawerOpen = step === 'visit_2_drawer';
+
+  const showTPWriting = step === 'tp_writing' || step === 'tp_saved' || step === 'visit_1' || step === 'visit_2' || step === 'visit_2_drawer';
+  const showVoxis = step === 'consultation_voxis';
+  const showTPStatus = step === 'tp_saved' || step === 'visit_1' || step === 'visit_2' || step === 'visit_2_drawer';
+  const showVisit1Completed = step === 'visit_2' || step === 'visit_2_drawer';
+  const showVisit2 = step === 'visit_1' || step === 'visit_2' || step === 'visit_2_drawer';
+
+  const editActions = (
+    <span style={{ display: 'flex', gap: 13, alignItems: 'center' }}>
+      <Pencil size={17} style={{ cursor: 'pointer', opacity: 0.6 }} />
+      <X size={18} style={{ cursor: 'pointer', opacity: 0.6 }} />
+    </span>
+  );
+
+  const doneCheck = <span style={{ color: 'var(--color-success-500)', fontSize: 18 }}>✓</span>;
+
+  return (
+    <div className={styles.page}>
+      {/* Step selector bar (demo) */}
+      <div className={styles.stepBar}>
+        <span className={styles.stepBarLabel}>Lépés:</span>
+        {(Object.entries(STEP_LABELS) as [WorkflowStep, string][]).map(([key, label]) => (
+          <button
+            key={key}
+            className={`${styles.stepBtn} ${step === key ? styles.stepBtnActive : ''}`}
+            onClick={() => setStep(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* TopNav */}
+      <TopNav
+        items={[
+          { id: 'nyilv', label: 'Nyilvántartás' },
+          { id: 'naptar', label: 'Naptár' },
+          { id: 'dok', label: 'Dokumentumok' },
+          { id: 'crm', label: 'CRM' },
+          { id: 'penz', label: 'Pénzügy' },
+          { id: 'riport', label: 'Riportok' },
+          { id: 'biroja', label: 'Bíró János Attila' },
+        ]}
+        activeId={activeNav}
+        onSelect={setActiveNav}
+      />
+
+      {/* Main Layout */}
+      <div className={styles.layout}>
+        <SideNav
+          items={[
+            { id: 'torzsadat', icon: <Users size={20} />, label: 'Törzsadatok' },
+            { id: 'dok', icon: <Files size={20} />, label: 'Dokumentumok' },
+            { id: 'kezeles', icon: <ChartBar size={20} />, label: 'Kezelés' },
+            { id: 'penzugy', icon: <CurrencyDollar size={20} />, label: 'Pénzügyek' },
+          ]}
+          activeId={activeSide}
+          onSelect={setActiveSide}
+        />
+
+        <div className={styles.content}>
+          <div className={styles.adminBase}>
+            <Breadcrumbs
+              items={[
+                { label: 'Bíró János Attila' },
+                { label: 'KEZELÉSI TERV' },
+              ]}
+            />
+
+            <AdminHeader
+              patientName="Bíró János Attila"
+              status={STATUS_MAP[step]}
+            />
+
+            <div className={styles.columns}>
+              {/* LEFT PANEL */}
+              <div className={styles.leftPanel}>
+                <ContentTabbedPanel />
+                <StatusTabbedPanel />
+              </div>
+
+              {/* RIGHT PANEL */}
+              <div className={styles.rightPanel}>
+                <Tabs
+                  items={[
+                    { id: 'kezeles', label: 'Kezelési terv' },
+                    { id: 'idopont', label: 'Időpont' },
+                  ]}
+                  activeId={rightTab}
+                  onSelect={setRightTab}
+                  variant="light"
+                />
+
+                <div className={styles.rightContent}>
+                  {/* TP Status Header */}
+                  {showTPStatus && (
+                    <TPStatusHeader
+                      status="ELFOGADVA"
+                      date="2026. 01. 26. 14:34"
+                      doctorName="Dr. Harmathy Béla"
+                    />
+                  )}
+
+                  {/* TP Header bar */}
+                  <TPHeader
+                    id="#1301234567899"
+                    title={showTPWriting ? 'All-on-4 felső, full kontúr cirkon híd' : 'Konzultáció'}
+                    showIcons
+                  />
+
+                  {/* ── CONSULTATION SECTION ── */}
+                  <VisitDivider
+                    visitNumber={1}
+                    status={showVisit1Completed ? 'completed' : step === 'visit_1' ? 'active' : 'upcoming'}
+                    actionLabel={step === 'consultation_default' ? 'Konzultáció indítása' : undefined}
+                    date={showVisit1Completed ? '2026. 02. 11. (Hé) 13:00' : undefined}
+                    doctorName={showVisit1Completed ? 'Dr. Harmathy Béla' : undefined}
+                  />
+
+                  {/* Document rows */}
+                  <DocumentRow
+                    name="Beleegyező / Röntgen"
+                    status={showTPWriting ? 'signed' : 'alert'}
+                  />
+
+                  {/* Consultation treatment rows */}
+                  {CONSULT_ITEMS.map((item, i) => (
+                    <TreatmentPlanRow
+                      key={`consult-${i}`}
+                      type={showVisit1Completed ? 'row-done' : 'row-edit'}
+                      label={item.name}
+                      secondaryLabel={`${item.area}   ${item.price}   ${item.qty}`}
+                      amount={item.total}
+                      actions={showVisit1Completed ? doneCheck : editActions}
+                    />
+                  ))}
+
+                  <AddTreatmentRow />
+                  <VisitSumRow label="KONZULTÁCIÓ ÖSSZESEN" amount={showTPWriting ? '61 500 Ft' : '33 000 Ft'} />
+
+                  {!showTPWriting && (
+                    <VisitDivider visitNumber={1} actionLabel="Konzultáció lezárása" />
+                  )}
+
+                  {/* ── TREATMENT PLAN SECTION ── */}
+                  {showTPWriting && (
+                    <>
+                      {(step === 'tp_saved' || step === 'visit_1' || step === 'visit_2') && (
+                        <TPHeader id="#1301234567899" title="All-on-4 felső, full kontúr cirkon híd" showIcons />
+                      )}
+
+                      <VisitDivider
+                        visitNumber={1}
+                        status={showVisit1Completed ? 'active' : 'upcoming'}
+                      />
+
+                      {VISIT1_ITEMS.map((item, i) => (
+                        <TreatmentPlanRow
+                          key={`v1-${i}`}
+                          type={showVisit1Completed ? 'row-done' : 'row-edit'}
+                          label={item.name}
+                          secondaryLabel={`${item.area}   ${item.price}   ${item.qty}`}
+                          amount={item.total}
+                          actions={showVisit1Completed ? doneCheck : editActions}
+                        />
+                      ))}
+
+                      <AddTreatmentRow label="+ Új kezelés hozzáadása" />
+                      <DurationRow />
+                      <VisitSumRow
+                        label="1. vizit összesen"
+                        amount={showVisit1Completed ? 'Fizetve: 1 000 000 Ft' : '1 000 000 Ft'}
+                        variant={showVisit1Completed ? 'total' : 'visit'}
+                      />
+
+                      {/* Visit 2 */}
+                      {showVisit2 && (
+                        <>
+                          <VisitDivider
+                            visitNumber={2}
+                            actionLabel={step === 'visit_2' ? 'Vizit indítása' : undefined}
+                          />
+
+                          {VISIT2_ITEMS.map((item, i) => (
+                            <TreatmentPlanRow
+                              key={`v2-${i}`}
+                              type="row-edit"
+                              label={item.name}
+                              secondaryLabel={`${item.area}   ${item.price}   ${item.qty}`}
+                              amount={item.total}
+                              actions={editActions}
+                            />
+                          ))}
+
+                          <AddTreatmentRow label="+ Új kezelés hozzáadása" />
+                          {showVisit1Completed && <DocumentRow name="Protetika átadási nyilatkozat" status="alert" />}
+                          <DurationRow />
+                          <VisitSumRow label="2. vizit összesen" amount="1 000 000 Ft" />
+                        </>
+                      )}
+
+                      <VisitSumRow label="KEZELÉS ÖSSZESEN" amount="2 000 000 Ft" variant="total" />
+
+                      {step === 'tp_writing' && <SaveTPRow />}
+                      {step === 'visit_2' && <VisitDivider visitNumber={2} actionLabel="Vizit lezárása" />}
+                    </>
+                  )}
+
+                  {/* Voxis section */}
+                  {showVoxis && (
+                    <>
+                      <TPHeader id="#1301234567899" title="Konzultáció" showIcons={false} />
+                      <BeviteliMod />
+                      <VoiceRecordingBar />
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Drawer — only visible in the '2. vizit + Drawer' state */}
+      <TreatmentDetailDrawer open={drawerOpen} onClose={() => {}} />
+    </div>
+  );
+}

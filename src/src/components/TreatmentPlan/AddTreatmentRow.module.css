@@ -1,0 +1,21 @@
+.row {
+  display: flex;
+  align-items: center;
+  padding: 0 30px;
+  height: 16px;
+  width: 100%;
+}
+.link {
+  font-family: var(--font-family);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-500);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--transition-fast);
+}
+.link:hover {
+  color: var(--color-primary-400);
+}

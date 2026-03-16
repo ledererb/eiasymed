@@ -1,0 +1,42 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  padding: 10px 30px;
+  background: var(--color-white);
+  width: 100%;
+}
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--color-white);
+  border: 1px solid var(--color-primary-900);
+  border-radius: 20px;
+  padding: 0 10px 0 0;
+  height: 25px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.btn:hover {
+  border-color: var(--color-primary-200);
+  box-shadow: 0 0 0 1px var(--color-primary-200);
+}
+.iconCircle {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--color-primary-900);
+  color: var(--color-primary-900);
+  flex-shrink: 0;
+}
+.label {
+  font-family: var(--font-family);
+  font-size: var(--font-size-10);
+  color: var(--color-primary-900);
+  white-space: nowrap;
+}

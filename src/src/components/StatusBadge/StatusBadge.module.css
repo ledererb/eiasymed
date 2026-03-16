@@ -29,6 +29,7 @@
 .waiting { background-color: var(--color-status-waiting); }
 .rejected { background-color: var(--color-status-rejected); }
 .inactive { background-color: var(--color-status-inactive); }
+.arrived { background-color: #fff1f9; border: 1px solid #c43284; color: #c43284; font-size: 12px; }
 
 /* Dot-only variant (for legends) */
 .dotOnly {
