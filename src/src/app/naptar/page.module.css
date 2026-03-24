@@ -289,6 +289,15 @@
   min-height: unset !important;
   height: 100%;
 }
+.calEntry:active { cursor: grabbing; }
+.calEntryDragging {
+  opacity: 0.4;
+  transform: scale(0.95);
+  z-index: 0 !important;
+}
+.dayColumn.dragOver {
+  background: rgba(99, 102, 241, 0.04);
+}
 
 /* "Now" indicator line */
 .nowLine {

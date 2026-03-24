@@ -164,6 +164,9 @@ export default function NaptarPage() {
   const [doctors, setDoctors] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Drag-and-drop state
+  const [draggingEventId, setDraggingEventId] = useState<string | null>(null);
+
   const supabase = createClient();
 
   // Generate day headers for current week
@@ -307,6 +310,81 @@ export default function NaptarPage() {
 
   const goToPrevWeek = () => setCurrentWeekStart(prev => subWeeks(prev, 1));
   const goToNextWeek = () => setCurrentWeekStart(prev => addWeeks(prev, 1));
+
+  // ─── Drag-and-drop handlers ───
+  const handleDragStart = useCallback((e: React.DragEvent, event: CalendarEvent) => {
+    setDraggingEventId(event.id);
+    e.dataTransfer.setData('text/plain', event.id);
+    e.dataTransfer.effectAllowed = 'move';
+    // Create a subtle drag image
+    const el = e.currentTarget as HTMLElement;
+    if (el) {
+      e.dataTransfer.setDragImage(el, el.offsetWidth / 2, 15);
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const handleDrop = useCallback(async (e: React.DragEvent, dayIdx: number) => {
+    e.preventDefault();
+    const eventId = e.dataTransfer.getData('text/plain');
+    if (!eventId) return;
+
+    const columnEl = e.currentTarget as HTMLElement;
+    const rect = columnEl.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+
+    // Convert Y position to time (snap to 15-min intervals)
+    const rawHours = y / PX_PER_HOUR + BASE_HOUR;
+    const totalMinutes = Math.round(rawHours * 60 / 15) * 15; // snap to 15-min
+    const newStartHour = Math.floor(totalMinutes / 60);
+    const newStartMin = totalMinutes % 60;
+
+    // Find original event to keep duration
+    const originalEvent = events.find(ev => ev.id === eventId);
+    if (!originalEvent) return;
+
+    const originalDuration = (originalEvent.endHour * 60 + originalEvent.endMin) - (originalEvent.startHour * 60 + originalEvent.startMin);
+    const newEndTotalMin = newStartHour * 60 + newStartMin + originalDuration;
+    const newEndHour = Math.floor(newEndTotalMin / 60);
+    const newEndMin = newEndTotalMin % 60;
+
+    // Build new dates
+    const targetDate = addDays(currentWeekStart, dayIdx);
+    const newStart = new Date(targetDate);
+    newStart.setHours(newStartHour, newStartMin, 0, 0);
+    const newEnd = new Date(targetDate);
+    newEnd.setHours(newEndHour, newEndMin, 0, 0);
+
+    // Optimistic update
+    setEvents(prev => prev.map(ev => ev.id === eventId ? {
+      ...ev,
+      day: dayIdx,
+      startHour: newStartHour,
+      startMin: newStartMin,
+      endHour: newEndHour,
+      endMin: newEndMin,
+    } : ev));
+    setDraggingEventId(null);
+
+    // Update Supabase
+    await supabase
+      .from('appointments')
+      .update({
+        start_time: newStart.toISOString(),
+        end_time: newEnd.toISOString(),
+      })
+      .eq('id', originalEvent.appointmentId || eventId);
+
+    // Realtime subscription will auto-refresh, but we already did optimistic update
+  }, [events, currentWeekStart, supabase]);
+
+  const handleDragEnd = useCallback(() => {
+    setDraggingEventId(null);
+  }, []);
 
   // Save appointment (create or edit)
   const handleSaveAppointment = useCallback(async (data: AppointmentFormData, id?: string) => {
@@ -478,7 +556,12 @@ export default function NaptarPage() {
                   const dayEvents = events.filter(e => e.day === dayIdx);
                   const layouted = layoutEvents(dayEvents);
                   return (
-                    <div key={dayIdx} className={styles.dayColumn}>
+                    <div
+                    key={dayIdx}
+                    className={styles.dayColumn}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, dayIdx)}
+                  >
                       {/* Hour guide lines */}
                       {Array.from({ length: 21 }, (_, i) => (
                         <div key={i} className={styles.hourGuide} style={{ top: i * 37.5 }} />
@@ -494,13 +577,16 @@ export default function NaptarPage() {
                         return (
                           <div
                             key={event.id}
-                            className={styles.calEntry}
+                            className={`${styles.calEntry} ${draggingEventId === event.id ? styles.calEntryDragging : ''}`}
                             style={{
                               top,
                               height,
                               left: `calc(${leftPct}% + 2px)`,
                               right: `calc(${100 - leftPct - widthPct}% + 2px)`,
                             }}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, event)}
+                            onDragEnd={handleDragEnd}
                             onDoubleClick={() => handleEventDoubleClick(event)}
                           >
                             <CalendarEntry
