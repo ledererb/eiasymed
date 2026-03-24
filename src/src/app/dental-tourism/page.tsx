@@ -220,7 +220,7 @@ export default function DentalTourismPage() {
       consultation_id: consultation.id,
       quote_reference: quoteRef,
       currency: 'EUR',
-      total_amount: pkg.price_eur,
+      treatment_total: pkg.price_eur,
       valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       status: 'draft',
     }).select().single();

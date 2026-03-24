@@ -55,7 +55,7 @@ export default function RiportokPage() {
       const [patientsRes, appointmentsRes, invoicesRes, leadsRes, paymentsRes, staffRes] = await Promise.all([
         supabase.from('patients').select('id, created_at, gender, birth_date'),
         supabase.from('appointments').select('id, start_time, appointment_type, status, doctor_id'),
-        supabase.from('invoices').select('id, invoice_date, total_amount, paid_amount, currency, status, payment_method'),
+        supabase.from('invoices').select('id, issued_at, gross_amount, paid_amount, currency, status, payment_method'),
         supabase.from('leads').select('id', { count: 'exact', head: true }),
         supabase.from('payments').select('id, amount, payment_method, created_at'),
         supabase.from('staff').select('id, first_name, last_name, role').eq('role', 'doctor'),
@@ -67,7 +67,7 @@ export default function RiportokPage() {
       const payments = paymentsRes.data || [];
       const doctors = staffRes.data || [];
 
-      const totalRevenue = invoices.reduce((s, i) => s + (i.total_amount || 0), 0);
+      const totalRevenue = invoices.reduce((s, i) => s + (i.gross_amount || 0), 0);
       const now = new Date();
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -85,10 +85,10 @@ export default function RiportokPage() {
       const revenueByMonth: Record<string, number> = {};
       MONTH_NAMES.forEach(m => { revenueByMonth[m] = 0; });
       invoices.forEach(inv => {
-        const d = new Date(inv.invoice_date);
+        const d = new Date(inv.issued_at);
         const mIdx = d.getMonth();
         if (d.getFullYear() === now.getFullYear()) {
-          revenueByMonth[MONTH_NAMES[mIdx]] += inv.total_amount || 0;
+          revenueByMonth[MONTH_NAMES[mIdx]] += inv.gross_amount || 0;
         }
       });
       setMonthlyRevenue(MONTH_NAMES.map(m => ({ month: m, revenue: revenueByMonth[m] })));
@@ -115,10 +115,10 @@ export default function RiportokPage() {
         const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
         const dayRevenue = invoices
           .filter(inv => {
-            const id = new Date(inv.invoice_date);
+            const id = new Date(inv.issued_at);
             return id.toDateString() === d.toDateString();
           })
-          .reduce((s, inv) => s + (inv.total_amount || 0), 0);
+          .reduce((s, inv) => s + (inv.gross_amount || 0), 0);
         last30.push({ date: dateStr, revenue: dayRevenue });
       }
       setDailyRevenue(last30);

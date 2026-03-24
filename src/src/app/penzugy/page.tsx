@@ -38,12 +38,12 @@ interface Payment {
 interface Invoice {
   id: string;
   invoice_number: string;
-  invoice_date: string;
+  issued_at: string;
   due_date: string;
-  total_amount: number;
+  gross_amount: number;
   paid_amount: number;
   currency: string;
-  status: string;
+  payment_status: string;
   payment_method: string | null;
   patient: { id: string; first_name: string; last_name: string } | null;
 }
@@ -91,10 +91,10 @@ export default function PenzugyPage() {
     let query = supabase
       .from('invoices')
       .select(`
-        id, invoice_number, invoice_date, due_date, total_amount, paid_amount, currency, status, payment_method,
+        id, invoice_number, issued_at, due_date, gross_amount, paid_amount, currency, payment_status, payment_method,
         patient:patients!invoices_patient_id_fkey(id, first_name, last_name)
       `)
-      .order('invoice_date', { ascending: false })
+      .order('issued_at', { ascending: false })
       .limit(50);
 
     if (searchQuery.trim()) {
@@ -118,14 +118,14 @@ export default function PenzugyPage() {
     async function fetchStats() {
       const { data } = await supabase
         .from('invoices')
-        .select('total_amount, status');
+        .select('gross_amount, payment_status');
 
       if (data) {
         setStats({
-          totalRevenue: data.reduce((s, i) => s + (i.total_amount || 0), 0),
-          paidCount: data.filter(i => i.status === 'paid').length,
-          unpaidCount: data.filter(i => i.status === 'unpaid').length,
-          overdueCount: data.filter(i => i.status === 'overdue').length,
+          totalRevenue: data.reduce((s, i) => s + (i.gross_amount || 0), 0),
+          paidCount: data.filter(i => i.payment_status === 'paid').length,
+          unpaidCount: data.filter(i => i.payment_status === 'unpaid').length,
+          overdueCount: data.filter(i => i.payment_status === 'overdue').length,
         });
       }
     }
@@ -178,8 +178,8 @@ export default function PenzugyPage() {
     });
 
     const newPaidAmount = (payingInvoice.paid_amount || 0) + amount;
-    const newStatus = newPaidAmount >= payingInvoice.total_amount ? 'paid' : 'unpaid';
-    await supabase.from('invoices').update({ paid_amount: newPaidAmount, status: newStatus }).eq('id', payingInvoice.id);
+    const newStatus = newPaidAmount >= payingInvoice.gross_amount ? 'paid' : 'unpaid';
+    await supabase.from('invoices').update({ paid_amount: newPaidAmount, payment_status: newStatus }).eq('id', payingInvoice.id);
 
     setPayDrawerOpen(false);
     setPayingInvoice(null);
@@ -308,7 +308,7 @@ export default function PenzugyPage() {
                 <tr><td colSpan={7} className={styles.emptyCell}>Még nincsenek számlák.</td></tr>
               ) : (
                 invoices.map((inv) => {
-                  const badge = STATUS_TO_BADGE[inv.status] || STATUS_TO_BADGE.draft;
+                  const badge = STATUS_TO_BADGE[inv.payment_status] || STATUS_TO_BADGE.draft;
                   return (
                     <tr key={inv.id} className={styles.tableRow}>
                       <td>
@@ -323,25 +323,25 @@ export default function PenzugyPage() {
                       <td>
                         <div className={styles.dateCell}>
                           <CalendarBlank size={14} color="var(--color-neutral-400)" />
-                          {format(new Date(inv.invoice_date), 'yyyy. MM. dd.', { locale: hu })}
+                          {format(new Date(inv.issued_at), 'yyyy. MM. dd.', { locale: hu })}
                         </div>
                       </td>
                       <td className={styles.dateCell}>
                         {format(new Date(inv.due_date), 'yyyy. MM. dd.', { locale: hu })}
                       </td>
                       <td className={styles.amountCell}>
-                        {formatCurrency(inv.total_amount, inv.currency)}
+                        {formatCurrency(inv.gross_amount, inv.currency)}
                       </td>
                       <td>
                         <StatusBadge status={badge.variant} label={badge.label} />
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: 4 }}>
-                          {inv.status !== 'paid' && (
+                          {inv.payment_status !== 'paid' && (
                             <button
                               className={styles.payBtn}
                               title="Fizetés rögzítése"
-                              onClick={() => { setPayingInvoice(inv); setPayAmount(String(inv.total_amount - (inv.paid_amount || 0))); setPayDrawerOpen(true); }}
+                              onClick={() => { setPayingInvoice(inv); setPayAmount(String(inv.gross_amount - (inv.paid_amount || 0))); setPayDrawerOpen(true); }}
                             >
                               <CreditCard size={14} /> Fizet
                             </button>
@@ -506,7 +506,7 @@ export default function PenzugyPage() {
               <p style={{ margin: 0, fontSize: 13, color: 'var(--color-neutral-500)' }}>Számla</p>
               <p style={{ margin: '4px 0 0', fontSize: 16, fontWeight: 700 }}>{payingInvoice.invoice_number}</p>
               <p style={{ margin: '4px 0 0', fontSize: 14 }}>
-                Fizetendő: <strong>{formatCurrency(payingInvoice.total_amount - (payingInvoice.paid_amount || 0))}</strong>
+                Fizetendő: <strong>{formatCurrency(payingInvoice.gross_amount - (payingInvoice.paid_amount || 0))}</strong>
               </p>
             </div>
             <InputField label="Összeg (Ft)" type="number" value={payAmount} onChange={e => setPayAmount(e.target.value)} />

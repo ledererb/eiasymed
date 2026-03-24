@@ -40,12 +40,12 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSave, onCancel }) =>
     async function fetchPriceList() {
       const { data } = await supabase
         .from('price_list')
-        .select('id, item_name, base_price')
+        .select('id, treatment_type_id, base_price, treatment_types!inner(name)')
         .eq('is_active', true)
-        .order('item_name');
+        .order('treatment_type_id');
 
       if (data) {
-        setPriceList(data.map(p => ({ id: p.id, label: p.item_name, price: p.base_price })));
+        setPriceList(data.map(p => ({ id: p.id, label: (p as any).treatment_types?.name || 'N/A', price: p.base_price })));
       }
     }
     fetchPriceList();
@@ -128,15 +128,16 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSave, onCancel }) =>
         invoice_type: 'normal',
         patient_id: patientId,
         location_id: locationId,
-        invoice_date: today,
+        issued_at: today,
         due_date: today,
-        subtotal_amount: subtotal,
+        net_amount: subtotal,
         vat_amount: vatTotal,
-        total_amount: grandTotal,
+        gross_amount: grandTotal,
         currency: 'HUF',
-        status: 'unpaid',
+        payment_status: 'unpaid',
+        status: 'issued',
         payment_method: paymentMethod,
-        notes,
+        internal_notes: notes,
       })
       .select('id')
       .single();
@@ -153,10 +154,11 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSave, onCancel }) =>
       description: li.description,
       quantity: li.quantity,
       unit_price: li.unit_price,
+      net_amount: li.quantity * li.unit_price,
       vat_rate: li.vat_rate,
       vat_amount: li.quantity * li.unit_price * (li.vat_rate / 100),
-      total_price: li.quantity * li.unit_price * (1 + li.vat_rate / 100),
-      line_order: idx + 1,
+      gross_amount: li.quantity * li.unit_price * (1 + li.vat_rate / 100),
+      line_number: idx + 1,
     }));
 
     await supabase.from('invoice_items').insert(items);
