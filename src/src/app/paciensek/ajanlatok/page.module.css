@@ -1,0 +1,649 @@
+/* Ajánlatok (Treatment Plans / Quotes) page — Figma 2.a spec */
+
+/* ────── Toolbar ────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+  padding: 8px 0;
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.toolbarBtn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #cfcfcf;
+  border-radius: 7px;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  color: #5f7d95;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.toolbarBtn:hover {
+  border-color: #186d98;
+  color: #186d98;
+}
+
+.toolbarBtn.active {
+  border-color: #186d98;
+  background: #186d98;
+  color: white;
+}
+
+.toolbarLabel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: #5f7d95;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 7px;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+
+.toolbarLabel:hover {
+  color: #186d98;
+}
+
+/* Filter chips */
+.filterChips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filterChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 4px 12px;
+  border-radius: 50px;
+  background: #186d98;
+  color: white;
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filterChipClose {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.filterChipClose:hover {
+  opacity: 1;
+}
+
+/* Search expanded */
+.searchExpanded {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  width: 160px;
+  border: 1px solid #cfcfcf;
+  border-radius: 7px;
+  padding: 0 12px;
+  background: white;
+}
+
+.searchExpanded input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: #082432;
+  background: transparent;
+  width: 100%;
+}
+
+.searchExpanded input::placeholder {
+  color: #bfc9cf;
+}
+
+/* Bulk actions */
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #cfcfcf;
+  border-radius: 7px;
+  background: white;
+  cursor: default;
+}
+
+.bulkIcon {
+  color: #5f7d95;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.bulkIcon:hover {
+  color: #186d98;
+}
+
+/* ────── Table ────── */
+.tableWrap {
+  background: white;
+  border-radius: 0 0 20px 20px;
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #f5f5f5;
+  padding: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.th {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: #5f7d95;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.thLeft {
+  composes: th;
+  justify-content: flex-start;
+  padding: 0 15px;
+}
+
+/* Column widths from Figma */
+.colCheck   { width: 50px; }
+.colN       { width: 50px; }
+.colPatient { width: 250px; }
+.colQuoteNo { width: 140px; }
+.colStatus  { width: 140px; }
+.colSubject { width: 170px; }
+.colCreator { width: 170px; }
+.colValue   { width: 170px; }
+.colActions { width: 50px; }
+
+/* ────── Table Rows ────── */
+.tableBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tableRow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border-bottom: 1px solid #d9d9d9;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  min-height: 70px;
+}
+
+.tableRow:hover {
+  background: #f8f8f8;
+}
+
+.tableRow.selected {
+  background: #fff1f9;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+/* ────── Cell styles ────── */
+.cell {
+  display: flex;
+  align-items: center;
+  height: 70px;
+  flex-shrink: 0;
+}
+
+.cellCenter {
+  composes: cell;
+  justify-content: center;
+}
+
+/* Checkbox cell */
+.checkboxCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1.5px solid #bfc9cf;
+  background: white;
+  cursor: pointer;
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.checkbox:checked {
+  background: #186d98;
+  border-color: #186d98;
+}
+
+.checkbox:checked::after {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Flag cell */
+.flagCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.flagIcon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Patient cell */
+.patientCell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 70px;
+  padding: 0 15px;
+  overflow: hidden;
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.patientName {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  color: #082432;
+  line-height: 25px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.patientId {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #5f7d95;
+  line-height: 25px;
+}
+
+/* Quote number cell */
+.quoteNoCell {
+  display: flex;
+  align-items: center;
+  height: 70px;
+  padding: 0 15px;
+  width: 140px;
+  flex-shrink: 0;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #082432;
+}
+
+/* Subject cell */
+.subjectCell {
+  display: flex;
+  align-items: center;
+  height: 70px;
+  padding: 0 12px;
+  width: 170px;
+  flex-shrink: 0;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #082432;
+  overflow: hidden;
+}
+
+.subjectText {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+/* Creator cell */
+.creatorCell {
+  display: flex;
+  align-items: center;
+  height: 70px;
+  padding: 0 12px;
+  width: 170px;
+  flex-shrink: 0;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #082432;
+}
+
+/* Value cell */
+.valueCell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 70px;
+  padding: 0 15px;
+  width: 170px;
+  flex-shrink: 0;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  color: #082432;
+  white-space: nowrap;
+}
+
+/* Actions cell */
+.actionsCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.actionsBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #5f7d95;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.12s;
+}
+
+.actionsBtn:hover {
+  background: #f0f0f0;
+  color: #082432;
+}
+
+/* ────── Drawer content ────── */
+.drawerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.drawerPatientHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 12px;
+}
+
+.drawerPatientName {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 20px;
+  color: #082432;
+}
+
+.drawerPatientMeta {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #5f7d95;
+}
+
+.drawerLink {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  color: #186d98;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-end;
+}
+
+.drawerLink:hover {
+  text-decoration: underline;
+}
+
+/* Quote header bar */
+.quoteHeaderBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #186d98;
+  border-radius: 10px;
+  color: white;
+}
+
+.quoteNumber {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.quoteTitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quoteActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.quoteActionBtn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.quoteActionBtn:hover {
+  opacity: 1;
+}
+
+/* Status row */
+.statusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.statusMeta {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  color: #5f7d95;
+  text-align: right;
+}
+
+/* Visit section */
+.visitSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 8px;
+}
+
+.visitTitle {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 12px;
+  color: #186d98;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 0;
+}
+
+.visitItem {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  gap: 8px;
+}
+
+.visitItemName {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: #082432;
+  min-width: 120px;
+}
+
+.visitItemArea {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  color: #5f7d95;
+  flex: 1;
+}
+
+.visitItemPrice {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  color: #5f7d95;
+  white-space: nowrap;
+}
+
+.visitItemTotal {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  color: #082432;
+  white-space: nowrap;
+  min-width: 100px;
+  text-align: right;
+}
+
+.visitItemCheck {
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
+/* Visit footer */
+.visitFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #5f7d95;
+}
+
+.visitTotal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.visitTotalLabel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: #186d98;
+}
+
+.visitTotalAmount {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
+  background: #dc2626;
+  color: white;
+  border-radius: 50px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.divider {
+  height: 1px;
+  background: #d9d9d9;
+  margin: 4px 0;
+}
+
+/* Loading & Empty */
+.loadingState,
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #5f7d95;
+  font-size: 14px;
+  gap: 8px;
+}

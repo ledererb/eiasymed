@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import {
   MagnifyingGlass, FunnelSimple, SortAscending, Columns,
   DotsThree, CaretDoubleLeft, CaretDoubleRight,
-  CurrencyCircleDollar, Clock, CalendarBlank
+  CurrencyCircleDollar, Clock, CalendarBlank,
+  Plus, User, Tag, ShieldCheck
 } from '@phosphor-icons/react';
 import { AppShell } from '@/components/AppShell';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -80,6 +81,16 @@ export default function PaciensekPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statsOpen, setStatsOpen] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [newPatientOpen, setNewPatientOpen] = useState(false);
+  const [newPatientType, setNewPatientType] = useState<'lead' | 'patient'>('lead');
+  const [newPatientForm, setNewPatientForm] = useState({
+    lastName: '', firstName: '', phone: '', email: '',
+    birthYear: '', birthMonth: '', birthDay: '',
+    language: 'magyar', currency: 'HUF',
+    treatmentTag: '', campaignTag: '', partnerTag: '', discountTag: '',
+    smsNotify: false, emailNotify: false,
+  });
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -189,9 +200,39 @@ export default function PaciensekPage() {
 
   const now = new Date();
 
+  /* ── Save new patient ── */
+  const handleSaveNewPatient = async (goToCalendar: boolean) => {
+    if (!newPatientForm.lastName || !newPatientForm.firstName) return;
+    setSaving(true);
+    const dob = newPatientForm.birthYear && newPatientForm.birthMonth && newPatientForm.birthDay
+      ? `${newPatientForm.birthYear}-${newPatientForm.birthMonth.padStart(2, '0')}-${newPatientForm.birthDay.padStart(2, '0')}`
+      : null;
+    const { error } = await supabase.from('patients').insert({
+      first_name: newPatientForm.firstName,
+      last_name: newPatientForm.lastName,
+      phone: newPatientForm.phone || null,
+      email: newPatientForm.email || null,
+      birth_date: dob,
+      address_country: 'HU',
+      status: newPatientType === 'lead' ? 'lead' : 'active',
+    });
+    setSaving(false);
+    if (!error) {
+      setNewPatientOpen(false);
+      setNewPatientForm({ lastName: '', firstName: '', phone: '', email: '', birthYear: '', birthMonth: '', birthDay: '', language: 'magyar', currency: 'HUF', treatmentTag: '', campaignTag: '', partnerTag: '', discountTag: '', smsNotify: false, emailNotify: false });
+      if (goToCalendar) router.push('/naptar');
+      else fetchAppointments();
+    }
+  };
+
   return (
     <AppShell>
       <Breadcrumbs items={[{ label: 'Nyilvántartás' }, { label: 'Páciensek' }]} />
+
+      {/* ── FAB + button ── */}
+      <button className={styles.fab} onClick={() => setNewPatientOpen(true)} title="Új páciens felvétele">
+        <Plus size={28} weight="bold" />
+      </button>
 
       {/* ── Info Panel (stat cards) ── */}
       <div className={styles.infoPanel}>
@@ -493,6 +534,185 @@ export default function PaciensekPage() {
             </button>
           </div>
         )}
+      </Drawer>
+
+      {/* ── New Patient Drawer ── */}
+      <Drawer
+        open={newPatientOpen}
+        onClose={() => setNewPatientOpen(false)}
+        title="Új páciens felvétele"
+        width="wide"
+      >
+        <div className={styles.newPatientForm}>
+          {/* Status selector */}
+          <div className={styles.formStatusRow}>
+            <button
+              className={`${styles.formStatusBtn} ${newPatientType === 'lead' ? styles.activeFormStatus : ''}`}
+              onClick={() => setNewPatientType('lead')}
+            >
+              ÚJ ÉRDEKLŐDŐ
+            </button>
+            <span className={styles.formStatusLabel}>Új páciens</span>
+          </div>
+
+          {/* Páciens Adatok */}
+          <div className={styles.formSection}>
+            <span className={styles.formSectionTitle}>
+              <User size={16} /> PÁCIENS ADATOK
+            </span>
+            <div className={styles.formRow}>
+              <div className={styles.formField}>
+                <span className={styles.formFieldLabel}>Vezetéknév</span>
+                <input
+                  className={styles.formInput}
+                  placeholder="Példa"
+                  value={newPatientForm.lastName}
+                  onChange={e => setNewPatientForm(f => ({ ...f, lastName: e.target.value }))}
+                />
+              </div>
+              <div className={styles.formField}>
+                <span className={styles.formFieldLabel}>Keresztnév</span>
+                <input
+                  className={styles.formInput}
+                  placeholder="István"
+                  value={newPatientForm.firstName}
+                  onChange={e => setNewPatientForm(f => ({ ...f, firstName: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formField}>
+                <span className={styles.formFieldLabel}>Telefon</span>
+                <input
+                  className={styles.formInput}
+                  placeholder="(+36) 30 123 4567"
+                  value={newPatientForm.phone}
+                  onChange={e => setNewPatientForm(f => ({ ...f, phone: e.target.value }))}
+                />
+              </div>
+              <div className={styles.formField}>
+                <span className={styles.formFieldLabel}>E-mail</span>
+                <input
+                  className={styles.formInput}
+                  type="email"
+                  placeholder="pelda@pelda.com"
+                  value={newPatientForm.email}
+                  onChange={e => setNewPatientForm(f => ({ ...f, email: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <span className={styles.formFieldLabel} style={{ width: '100%' }}>Születési dátum</span>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formField}>
+                <select className={styles.formSelect} value={newPatientForm.birthYear} onChange={e => setNewPatientForm(f => ({ ...f, birthYear: e.target.value }))}>
+                  <option value="">év</option>
+                  {Array.from({ length: 80 }, (_, i) => 2026 - i).map(y => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.formField}>
+                <select className={styles.formSelect} value={newPatientForm.birthMonth} onChange={e => setNewPatientForm(f => ({ ...f, birthMonth: e.target.value }))}>
+                  <option value="">hónap</option>
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.formField}>
+                <select className={styles.formSelect} value={newPatientForm.birthDay} onChange={e => setNewPatientForm(f => ({ ...f, birthDay: e.target.value }))}>
+                  <option value="">nap</option>
+                  {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formField}>
+                <select className={styles.formSelect} value={newPatientForm.language} onChange={e => setNewPatientForm(f => ({ ...f, language: e.target.value }))}>
+                  <option value="magyar">magyar</option>
+                  <option value="english">english</option>
+                  <option value="deutsch">deutsch</option>
+                </select>
+              </div>
+              <div className={styles.formField}>
+                <select className={styles.formSelect} value={newPatientForm.currency} onChange={e => setNewPatientForm(f => ({ ...f, currency: e.target.value }))}>
+                  <option value="HUF">HUF</option>
+                  <option value="EUR">EUR</option>
+                  <option value="USD">USD</option>
+                  <option value="GBP">GBP</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Címkék, jelölők */}
+          <div className={styles.formSection}>
+            <span className={styles.formSectionTitle}>
+              <Tag size={16} /> CÍMKÉK, JELÖLŐK
+            </span>
+            <div className={styles.formRow}>
+              <div className={styles.formField}>
+                <select className={styles.formSelect} value={newPatientForm.treatmentTag} onChange={e => setNewPatientForm(f => ({ ...f, treatmentTag: e.target.value }))}>
+                  <option value="">Igényelt kezelés</option>
+                  <option value="implant">Implantátum</option>
+                  <option value="cosmetic">Esztétika</option>
+                  <option value="preventive">Prevenció</option>
+                </select>
+              </div>
+              <div className={styles.formField}>
+                <select className={styles.formSelect} value={newPatientForm.campaignTag} onChange={e => setNewPatientForm(f => ({ ...f, campaignTag: e.target.value }))}>
+                  <option value="">Kampány</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="google">Google Ads</option>
+                  <option value="referral">Ajánlás</option>
+                </select>
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formField}>
+                <select className={styles.formSelect} value={newPatientForm.partnerTag} onChange={e => setNewPatientForm(f => ({ ...f, partnerTag: e.target.value }))}>
+                  <option value="">Partner</option>
+                </select>
+              </div>
+              <div className={styles.formField}>
+                <select className={styles.formSelect} value={newPatientForm.discountTag} onChange={e => setNewPatientForm(f => ({ ...f, discountTag: e.target.value }))}>
+                  <option value="">Egyéb kedvezmény</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Adatkezelés */}
+          <div className={styles.formSection}>
+            <span className={styles.formSectionTitle}>
+              <ShieldCheck size={16} /> ADATKEZELÉS
+            </span>
+            <div className={styles.formCheckboxRow}>
+              <label className={styles.formCheckbox}>
+                <input type="checkbox" checked={newPatientForm.smsNotify} onChange={e => setNewPatientForm(f => ({ ...f, smsNotify: e.target.checked }))} />
+                SMS értesítés
+              </label>
+              <label className={styles.formCheckbox}>
+                <input type="checkbox" checked={newPatientForm.emailNotify} onChange={e => setNewPatientForm(f => ({ ...f, emailNotify: e.target.checked }))} />
+                E-mail értesítés
+              </label>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className={styles.formActions}>
+            <button className={styles.btnSave} onClick={() => handleSaveNewPatient(false)} disabled={saving}>
+              {saving ? 'Mentés...' : 'Mentés'}
+            </button>
+            <button className={styles.btnSaveCalendar} onClick={() => handleSaveNewPatient(true)} disabled={saving}>
+              Mentés és ugrás naptárra
+            </button>
+          </div>
+        </div>
       </Drawer>
     </AppShell>
   );

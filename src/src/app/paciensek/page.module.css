@@ -612,3 +612,194 @@
   gap: 16px;
   margin-bottom: 0;
 }
+
+/* ────── FAB (Floating Add Button) ────── */
+.fab {
+  position: fixed;
+  top: 61px;
+  right: 30px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #082432;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.15s, background 0.15s;
+  z-index: 100;
+}
+
+.fab:hover {
+  background: #0a3045;
+  transform: scale(1.05);
+}
+
+/* ────── New Patient Form ────── */
+.newPatientForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 4px 0;
+}
+
+.formStatusRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.formStatusBtn {
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #d9d9d9;
+  background: white;
+  color: #082432;
+  transition: all 0.15s ease;
+}
+
+.formStatusBtn.activeFormStatus {
+  background: #22c55e;
+  color: white;
+  border-color: #22c55e;
+}
+
+.formStatusLabel {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #5f7d95;
+  margin-left: 8px;
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid #d9d9d9;
+  border-radius: 12px;
+}
+
+.formSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  color: #082432;
+  margin-bottom: 4px;
+}
+
+.formRow {
+  display: flex;
+  gap: 12px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.formFieldLabel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 12px;
+  color: #5f7d95;
+}
+
+.formInput {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: #082432;
+  background: white;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.formInput:focus {
+  border-color: #186d98;
+}
+
+.formInput::placeholder {
+  color: #bfc9cf;
+}
+
+.formSelect {
+  composes: formInput;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235f7d95' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+.formCheckboxRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.formCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: #082432;
+  cursor: pointer;
+}
+
+.formCheckbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: #186d98;
+}
+
+.formActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btnSave {
+  flex: 1;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: #dc2626;
+  color: white;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnSave:hover {
+  background: #b91c1c;
+}
+
+.btnSaveCalendar {
+  composes: btnSave;
+  background: #c43284;
+}
+
+.btnSaveCalendar:hover {
+  background: #a2005b;
+}
