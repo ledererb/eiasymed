@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   Phone, EnvelopeSimple, CalendarBlank, CurrencyCircleDollar,
-  ClipboardText, Tooth, ArrowLeft, MapPin, Cake,
+  ClipboardText, Tooth, ArrowLeft, MapPin, Cake, CloudArrowUp,
 } from '@phosphor-icons/react';
 import { AppShell } from '@/components/AppShell';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -78,6 +78,8 @@ export default function PatientDetailPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [treatmentPlans, setTreatmentPlans] = useState<TreatmentPlan[]>([]);
+  const [eesztSyncing, setEesztSyncing] = useState(false);
+  const [eesztStatus, setEesztStatus] = useState<string | null>(null);
 
   const fetchPatient = useCallback(async () => {
     setLoading(true);
@@ -193,8 +195,33 @@ export default function PatientDetailPage() {
           <Button variant="primary" onClick={() => router.push('/paciensek/ajanlatok')}>
             <ClipboardText size={16} /> Kezelési terv
           </Button>
+          <Button variant="outline" onClick={async () => {
+            setEesztSyncing(true);
+            setEesztStatus(null);
+            try {
+              const session = await supabase.auth.getSession();
+              const token = session.data.session?.access_token;
+              const resp = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/eeszt-torzslap`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ patient_id: patient.id }),
+              });
+              const result = await resp.json();
+              setEesztStatus(result.success ? `✅ ${result.message}` : `❌ ${result.error}`);
+            } catch (err) { setEesztStatus('❌ EESZT szinkronizálás hiba'); }
+            setEesztSyncing(false);
+            setTimeout(() => setEesztStatus(null), 4000);
+          }}>
+            <CloudArrowUp size={16} /> {eesztSyncing ? 'Szinkronizálás...' : 'EESZT szinkron'}
+          </Button>
         </div>
       </div>
+
+      {eesztStatus && (
+        <div style={{ padding: '8px 16px', borderRadius: 8, background: eesztStatus.includes('✅') ? '#dcfce7' : '#fee2e2', fontSize: 13, fontFamily: 'var(--font-family)', marginBottom: 12 }}>
+          {eesztStatus}
+        </div>
+      )}
 
       {/* ── KPI Row ── */}
       <div className={styles.kpiRow}>

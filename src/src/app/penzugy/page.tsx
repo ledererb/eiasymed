@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   MagnifyingGlass, Plus, Receipt, CurrencyCircleDollar, ArrowUp, ArrowDown,
-  FileText, CalendarBlank, Printer, CreditCard, Trash, Pencil, Check, X,
+  FileText, CalendarBlank, Printer, CreditCard, Trash, Pencil, Check, X, CloudArrowUp,
 } from '@phosphor-icons/react';
 import { AppShell } from '@/components/AppShell';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -46,6 +46,7 @@ interface Invoice {
   payment_status: string;
   payment_method: string | null;
   patient: { id: string; first_name: string; last_name: string } | null;
+  nav_status: string | null;
 }
 
 interface SummaryStats {
@@ -91,7 +92,7 @@ export default function PenzugyPage() {
     let query = supabase
       .from('invoices')
       .select(`
-        id, invoice_number, issued_at, due_date, gross_amount, paid_amount, currency, payment_status, payment_method,
+        id, invoice_number, issued_at, due_date, gross_amount, paid_amount, currency, payment_status, payment_method, nav_status,
         patient:patients!invoices_patient_id_fkey(id, first_name, last_name)
       `)
       .order('issued_at', { ascending: false })
@@ -298,14 +299,15 @@ export default function PenzugyPage() {
                 <th>Lejárat</th>
                 <th>Összeg</th>
                 <th>Státusz</th>
+                <th>NAV</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={7} className={styles.emptyCell}>Betöltés...</td></tr>
+                <tr><td colSpan={8} className={styles.emptyCell}>Betöltés...</td></tr>
               ) : invoices.length === 0 ? (
-                <tr><td colSpan={7} className={styles.emptyCell}>Még nincsenek számlák.</td></tr>
+                <tr><td colSpan={8} className={styles.emptyCell}>Még nincsenek számlák.</td></tr>
               ) : (
                 invoices.map((inv) => {
                   const badge = STATUS_TO_BADGE[inv.payment_status] || STATUS_TO_BADGE.draft;
@@ -334,6 +336,34 @@ export default function PenzugyPage() {
                       </td>
                       <td>
                         <StatusBadge status={badge.variant} label={badge.label} />
+                      </td>
+                      <td>
+                        {inv.nav_status === 'accepted' ? (
+                          <span style={{ fontSize: 11, padding: '3px 8px', borderRadius: 12, background: '#dcfce7', color: '#166534', fontWeight: 600 }}>✓ NAV</span>
+                        ) : inv.nav_status === 'submitted' ? (
+                          <span style={{ fontSize: 11, padding: '3px 8px', borderRadius: 12, background: '#dbeafe', color: '#1d4ed8', fontWeight: 600 }}>⏳ NAV</span>
+                        ) : inv.nav_status === 'rejected' ? (
+                          <span style={{ fontSize: 11, padding: '3px 8px', borderRadius: 12, background: '#fee2e2', color: '#991b1b', fontWeight: 600 }}>✗ NAV</span>
+                        ) : (
+                          <button
+                            style={{ fontSize: 11, padding: '3px 8px', borderRadius: 12, background: '#f5f5f5', color: '#5f7d95', border: '1px solid #e5e5e5', cursor: 'pointer', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 3 }}
+                            onClick={async () => {
+                              const s = createClient();
+                              const session = await s.auth.getSession();
+                              const token = session.data.session?.access_token;
+                              const resp = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/nav-invoice`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                body: JSON.stringify({ invoice_id: inv.id }),
+                              });
+                              const result = await resp.json();
+                              alert(result.message || 'NAV beküldés kész');
+                              fetchInvoices();
+                            }}
+                          >
+                            <CloudArrowUp size={12} /> NAV
+                          </button>
+                        )}
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: 4 }}>

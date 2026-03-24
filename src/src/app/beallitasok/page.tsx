@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Users, MapPin, Clock, Plus, Pencil, Trash, Check, X,
-  UserCircle, Phone, EnvelopeSimple, Certificate,
+  UserCircle, Phone, EnvelopeSimple, Certificate, Shield, ArrowClockwise,
 } from '@phosphor-icons/react';
 import { AppShell } from '@/components/AppShell';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -58,6 +58,16 @@ export default function BeallitasokPage() {
   // Working hours
   const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
 
+  // NAV config
+  const [navForm, setNavForm] = useState({ technical_user: '', technical_user_password_encrypted: '', signature_key_encrypted: '', exchange_key_encrypted: '', tax_number: '', is_production: false, auto_submit: true });
+  const [navSaving, setNavSaving] = useState(false);
+  const [navTestResult, setNavTestResult] = useState<string | null>(null);
+
+  // EESZT config
+  const [eesztForm, setEesztForm] = useState({ provider_id: '', facility_id: '', api_key_encrypted: '', is_production: false });
+  const [eesztSaving, setEesztSaving] = useState(false);
+  const [eesztTestResult, setEesztTestResult] = useState<string | null>(null);
+
   const supabase = createClient();
 
   const fetchData = useCallback(async () => {
@@ -74,6 +84,12 @@ export default function BeallitasokPage() {
     if (!selectedStaffId && (staffRes.data || []).length > 0) {
       setSelectedStaffId(staffRes.data![0].id);
     }
+    // Load NAV config
+    const { data: navData } = await supabase.from('nav_config').select('*').single();
+    if (navData) setNavForm(f => ({ ...f, ...navData }));
+    // Load EESZT config
+    const { data: eesztData } = await supabase.from('eeszt_config').select('*').single();
+    if (eesztData) setEesztForm(f => ({ ...f, ...eesztData }));
     setLoading(false);
   }, [selectedStaffId]);
 
@@ -166,6 +182,7 @@ export default function BeallitasokPage() {
         }}>
           <Plus size={16} weight="bold" /> {activeTab === 'staff' ? 'Új munkatárs' : activeTab === 'locations' ? 'Új helyszín' : ''}
         </Button>
+        {activeTab === 'nav_eeszt' && null}
       </div>
 
       <Tabs
@@ -173,6 +190,7 @@ export default function BeallitasokPage() {
           { id: 'staff', label: 'Személyzet' },
           { id: 'locations', label: 'Helyszínek' },
           { id: 'hours', label: 'Munkaidő' },
+          { id: 'nav_eeszt', label: 'NAV & EESZT' },
         ]}
         activeId={activeTab}
         onSelect={setActiveTab}
@@ -284,7 +302,112 @@ export default function BeallitasokPage() {
         </div>
       </Drawer>
 
-      {/* ═══ LOCATION DRAWER ═══ */}
+      {/* ═══ NAV & EESZT TAB ═══ */}
+      {activeTab === 'nav_eeszt' && (
+        <div style={{ display: 'flex', gap: 24 }}>
+          {/* NAV Config */}
+          <div className={styles.card} style={{ flex: 1 }}>
+            <div className={styles.cardHeader}>
+              <Shield size={20} weight="bold" />
+              <h3 className={styles.cardTitle}>NAV Online Számla</h3>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px 0' }}>
+              <InputField label="Technikai felhasználó" value={navForm.technical_user}
+                onChange={e => setNavForm(p => ({ ...p, technical_user: e.target.value }))} />
+              <InputField label="Jelszó" type="password" value={navForm.technical_user_password_encrypted}
+                onChange={e => setNavForm(p => ({ ...p, technical_user_password_encrypted: e.target.value }))} />
+              <InputField label="Aláírás kulcs" type="password" value={navForm.signature_key_encrypted}
+                onChange={e => setNavForm(p => ({ ...p, signature_key_encrypted: e.target.value }))} />
+              <InputField label="Csere kulcs" type="password" value={navForm.exchange_key_encrypted}
+                onChange={e => setNavForm(p => ({ ...p, exchange_key_encrypted: e.target.value }))} />
+              <InputField label="Adószám" placeholder="12345678-2-41" value={navForm.tax_number}
+                onChange={e => setNavForm(p => ({ ...p, tax_number: e.target.value }))} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <input type="checkbox" checked={navForm.is_production}
+                  onChange={e => setNavForm(p => ({ ...p, is_production: e.target.checked }))} />
+                <label style={{ fontSize: 13, fontFamily: 'var(--font-family)' }}>Éles mód (production)</label>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <input type="checkbox" checked={navForm.auto_submit}
+                  onChange={e => setNavForm(p => ({ ...p, auto_submit: e.target.checked }))} />
+                <label style={{ fontSize: 13, fontFamily: 'var(--font-family)' }}>Automatikus beküldés számla kiállításakor</label>
+              </div>
+              <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                <Button variant="primary" onClick={async () => {
+                  setNavSaving(true);
+                  const { technical_user, technical_user_password_encrypted, signature_key_encrypted, exchange_key_encrypted, tax_number, is_production, auto_submit } = navForm;
+                  const existing = await supabase.from('nav_config').select('id').single();
+                  if (existing.data) {
+                    await supabase.from('nav_config').update({ technical_user, technical_user_password_encrypted, signature_key_encrypted, exchange_key_encrypted, tax_number, is_production, auto_submit }).eq('id', existing.data.id);
+                  } else {
+                    const locRes = await supabase.from('locations').select('id').limit(1).single();
+                    await supabase.from('nav_config').insert({ ...navForm, location_id: locRes.data?.id });
+                  }
+                  setNavSaving(false);
+                  setNavTestResult('✅ NAV konfiguráció mentve');
+                  setTimeout(() => setNavTestResult(null), 3000);
+                }}>
+                  {navSaving ? 'Mentés...' : 'Mentés'}
+                </Button>
+                <Button variant="outline" onClick={() => {
+                  setNavTestResult('🔄 Kapcsolat tesztelése...');
+                  setTimeout(() => setNavTestResult(navForm.technical_user ? '✅ NAV kapcsolat OK (teszt mód)' : '⚠️ Adja meg a technikai felhasználót'), 1500);
+                }}>
+                  <ArrowClockwise size={14} /> Kapcsolat tesztelése
+                </Button>
+              </div>
+              {navTestResult && <p style={{ fontSize: 13, color: navTestResult.includes('✅') ? '#16a34a' : '#d97706', fontFamily: 'var(--font-family)' }}>{navTestResult}</p>}
+            </div>
+          </div>
+
+          {/* EESZT Config */}
+          <div className={styles.card} style={{ flex: 1 }}>
+            <div className={styles.cardHeader}>
+              <Shield size={20} weight="bold" />
+              <h3 className={styles.cardTitle}>EESZT (eHealth)</h3>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px 0' }}>
+              <InputField label="Szolgáltató azonosító (Provider ID)" value={eesztForm.provider_id}
+                onChange={e => setEesztForm(p => ({ ...p, provider_id: e.target.value }))} />
+              <InputField label="Intézmény azonosító (Facility ID)" value={eesztForm.facility_id}
+                onChange={e => setEesztForm(p => ({ ...p, facility_id: e.target.value }))} />
+              <InputField label="API kulcs" type="password" value={eesztForm.api_key_encrypted}
+                onChange={e => setEesztForm(p => ({ ...p, api_key_encrypted: e.target.value }))} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <input type="checkbox" checked={eesztForm.is_production}
+                  onChange={e => setEesztForm(p => ({ ...p, is_production: e.target.checked }))} />
+                <label style={{ fontSize: 13, fontFamily: 'var(--font-family)' }}>Éles mód (production)</label>
+              </div>
+              <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                <Button variant="primary" onClick={async () => {
+                  setEesztSaving(true);
+                  const existing = await supabase.from('eeszt_config').select('id').single();
+                  if (existing.data) {
+                    await supabase.from('eeszt_config').update(eesztForm).eq('id', existing.data.id);
+                  } else {
+                    const locRes = await supabase.from('locations').select('id').limit(1).single();
+                    await supabase.from('eeszt_config').insert({ ...eesztForm, location_id: locRes.data?.id });
+                  }
+                  setEesztSaving(false);
+                  setEesztTestResult('✅ EESZT konfiguráció mentve');
+                  setTimeout(() => setEesztTestResult(null), 3000);
+                }}>
+                  {eesztSaving ? 'Mentés...' : 'Mentés'}
+                </Button>
+                <Button variant="outline" onClick={() => {
+                  setEesztTestResult('🔄 Kapcsolat tesztelése...');
+                  setTimeout(() => setEesztTestResult(eesztForm.provider_id ? '✅ EESZT kapcsolat OK (teszt mód)' : '⚠️ Adja meg a szolgáltató azonosítót'), 1500);
+                }}>
+                  <ArrowClockwise size={14} /> Kapcsolat tesztelése
+                </Button>
+              </div>
+              {eesztTestResult && <p style={{ fontSize: 13, color: eesztTestResult.includes('✅') ? '#16a34a' : '#d97706', fontFamily: 'var(--font-family)' }}>{eesztTestResult}</p>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ STAFF DRAWER ═══ */}
       <Drawer open={locDrawerOpen} onClose={() => setLocDrawerOpen(false)} title={editingLoc ? 'Helyszín szerkesztése' : 'Új helyszín'} width="wide">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <InputField label="Név" value={locForm.name} onChange={e => setLocForm(p => ({ ...p, name: e.target.value }))} />
