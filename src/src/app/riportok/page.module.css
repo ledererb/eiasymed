@@ -1,0 +1,235 @@
+/* Analytics / Riportok page styles */
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary-900);
+  margin: 0;
+}
+
+.pageSubtitle {
+  font-size: 13px;
+  color: var(--color-neutral-500);
+  margin: 4px 0 0;
+}
+
+/* KPI Cards */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.kpiCard {
+  display: flex;
+  gap: 16px;
+  padding: 24px;
+  background: var(--color-white);
+  border-radius: var(--radius-12);
+  border: 1px solid var(--color-neutral-100);
+  transition: all 0.2s ease;
+}
+
+.kpiCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.kpiIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpiContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.kpiLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-neutral-500);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.kpiValue {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-primary-900);
+  margin: 4px 0;
+}
+
+.kpiChange {
+  font-size: 12px;
+  color: var(--color-neutral-500);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kpiUp {
+  color: #16a34a;
+}
+
+/* Charts grid */
+.chartsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.chartCard {
+  background: var(--color-white);
+  border-radius: var(--radius-12);
+  border: 1px solid var(--color-neutral-100);
+  padding: 24px;
+}
+
+.chartHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.chartTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-primary-900);
+  margin: 0;
+}
+
+.chartPlaceholder {
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bar chart */
+.barChart {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.bar {
+  flex: 1;
+  background: linear-gradient(to top, var(--color-primary-500), #2da5d4);
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  transition: all 0.3s ease;
+  min-height: 4px;
+}
+
+.bar:hover {
+  opacity: 0.8;
+}
+
+.barTooltip {
+  display: none;
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-primary-900);
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.bar:hover .barTooltip {
+  display: block;
+}
+
+.barLabels {
+  display: flex;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--color-neutral-400);
+}
+
+.barLabels span {
+  flex: 1;
+  text-align: center;
+}
+
+/* Treatment breakdown */
+.treatmentList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.treatmentRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.treatmentName {
+  width: 120px;
+  font-size: 13px;
+  color: var(--color-primary-900);
+  flex-shrink: 0;
+}
+
+.treatmentBar {
+  flex: 1;
+  height: 8px;
+  background: var(--color-neutral-100);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.treatmentBarFill {
+  height: 100%;
+  background: linear-gradient(to right, var(--color-primary-500), var(--color-brand-500));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.treatmentCount {
+  width: 30px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-neutral-600);
+}
+
+/* Quick stats */
+.quickStats {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 16px 24px;
+  background: var(--color-white);
+  border-radius: var(--radius-12);
+  border: 1px solid var(--color-neutral-100);
+}
+
+.quickStat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-neutral-600);
+}
+
+.quickStat strong {
+  color: var(--color-primary-900);
+}

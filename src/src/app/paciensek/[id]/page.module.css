@@ -1,0 +1,203 @@
+/* Patient detail page styles */
+
+.loading, .notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 0;
+  color: var(--color-neutral-400);
+  font-size: 16px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.headerInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-brand-500));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-primary-900);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vipBadge {
+  padding: 2px 8px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--color-neutral-500);
+}
+
+.metaRow span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Data grid */
+.dataGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section {
+  background: var(--color-white);
+  border-radius: var(--radius-12);
+  border: 1px solid var(--color-neutral-100);
+  padding: 20px 24px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 14px;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-neutral-700);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.notesField {
+  margin-top: 14px;
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-8);
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--color-primary-900);
+  resize: vertical;
+  outline: none;
+}
+
+.textarea:focus {
+  border-color: var(--color-primary-500);
+}
+
+.textarea:disabled {
+  background: var(--color-neutral-50);
+  color: var(--color-neutral-600);
+}
+
+/* Tables */
+.tableContainer {
+  background: var(--color-white);
+  border-radius: var(--radius-12);
+  border: 1px solid var(--color-neutral-100);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table thead th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-neutral-500);
+  background: var(--color-neutral-50);
+  border-bottom: 1px solid var(--color-neutral-100);
+}
+
+.table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-neutral-50);
+  color: var(--color-primary-900);
+}
+
+.tableRow {
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+.tableRow:hover { background: var(--color-neutral-50); }
+
+.treatmentType { font-weight: 600; color: var(--color-brand-500); }
+.amountCell { font-weight: 700; }
+.emptyCell { text-align: center; padding: 40px 16px !important; color: var(--color-neutral-400); }
+
+/* Placeholder tabs */
+.placeholderTab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 0;
+  color: var(--color-neutral-400);
+  font-size: 15px;
+  text-align: center;
+}
+
+.placeholderHint {
+  font-size: 12px;
+  color: var(--color-neutral-300);
+}

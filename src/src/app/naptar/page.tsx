@@ -1,13 +1,18 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   Funnel, MagnifyingGlass, CaretCircleLeft, CaretCircleRight, PlusCircle,
   Users, House, Flag, CaretLeft, CaretRight, Clock, X,
   Phone, EnvelopeSimple, CalendarBlank, PencilSimple, ArrowSquareOut, Tooth,
 } from '@phosphor-icons/react';
-import { TopNav } from '@/components/TopNav';
+import { AppShell } from '@/components/AppShell';
 import { CalendarEntry, CalendarColor } from '@/components/CalendarEntry';
+import { Drawer } from '@/components/Drawer';
+import { AppointmentForm, AppointmentFormData } from '@/components/AppointmentForm';
+import { createClient } from '@/lib/supabase-browser';
+import { format, startOfWeek, addDays, addWeeks, subWeeks, isToday } from 'date-fns';
+import { hu } from 'date-fns/locale';
 import styles from './page.module.css';
 
 /* ─── Types ─── */
@@ -28,49 +33,21 @@ interface CalendarEvent {
   room?: string;
   notes?: string;
   tags?: string[];
+  appointmentId?: string;
+  status?: string;
 }
 
-/* ─── Sample data matching Figma ─── */
-const DAYS = [
-  { date: 'március 2.', name: 'HÉTFŐ' },
-  { date: 'március 3.', name: 'KEDD' },
-  { date: 'március 4.', name: 'SZERDA' },
-  { date: 'március 5.', name: 'CSÜTÖRTÖK' },
-  { date: 'március 6.', name: 'PÉNTEK' },
-  { date: 'március 7.', name: 'SZOMBAT' },
-];
-
-const EVENTS: CalendarEvent[] = [
-  // Monday
-  { id: 'e1', day: 0, startHour: 8, startMin: 0, endHour: 9, endMin: 30, patient: 'Nagy Tamás', doctor: 'Dr. Harmathy Béla', category: 'implantáció', color: 'green', patientId: '223456781', phone: '+36 70 111 2222', email: 'nagy.tamas@mail.com', room: '1-es rendelő', tags: ['IMPLANTÁCIÓ'] },
-  { id: 'e2', day: 0, startHour: 9, startMin: 0, endHour: 11, endMin: 0, patient: 'Bíró János Attila', doctor: 'Dr. Kiss Orsolya', category: 'full kontúr cirkon híd', color: 'magenta', patientId: '223456782', phone: '+36 70 222 3333', email: 'biro.janos@mail.com', room: '2-es rendelő', tags: ['KONZULTÁCIÓ'] },
-  { id: 'e3', day: 0, startHour: 10, startMin: 15, endHour: 12, endMin: 0, patient: 'Majoros Ádám', doctor: 'Dr. Harmathy Béla', category: 'implantáció', color: 'green', patientId: '223456783', phone: '+36 70 333 4444', email: 'majoros.adam@mail.com', room: '1-es rendelő', tags: ['IMPLANTÁCIÓ'] },
-  { id: 'e4', day: 0, startHour: 11, startMin: 30, endHour: 13, endMin: 0, patient: 'Zilahy Máté', doctor: 'Dr. Kiss Orsolya', category: 'fémkerámia korona', color: 'magenta', patientId: '223456784', phone: '+36 70 444 5555', email: 'zilahy.mate@mail.com', room: '2-es rendelő', tags: ['KORONA'] },
-  { id: 'e5', day: 0, startHour: 13, startMin: 0, endHour: 14, endMin: 0, patient: 'Mérey Bernadett', doctor: 'Dr. Kardos Árpád', color: 'blue', patientId: '223456785', phone: '+36 70 555 6666', email: 'merey.b@mail.com', room: '3-as rendelő' },
-  { id: 'e6', day: 0, startHour: 14, startMin: 0, endHour: 15, endMin: 30, patient: 'Halmi Benjámin', doctor: 'Dr. Moór Izabella', category: 'fogszabályozás', color: 'lilac', patientId: '223456786', phone: '+36 70 666 7777', email: 'halmi.b@mail.com', room: '4-es rendelő', tags: ['FOGSZABÁLYOZÁS'] },
-  { id: 'e7', day: 0, startHour: 14, startMin: 30, endHour: 15, endMin: 45, patient: 'Kelemen Bálint', doctor: 'Dr. Kardos Árpád', category: 'bölcsességfog', color: 'blue', patientId: '223456787', phone: '+36 70 777 8888', email: 'kelemen.b@mail.com', room: '3-as rendelő' },
-  { id: 'e8', day: 0, startHour: 15, startMin: 30, endHour: 16, endMin: 30, patient: 'Laki Márton', doctor: 'Dr. Moór Izabella', category: 'konzultáció', color: 'lilac', patientId: '223456788', phone: '+36 70 888 9999', email: 'laki.m@mail.com', room: '4-es rendelő' },
-  // Tuesday
-  { id: 'e9', day: 1, startHour: 8, startMin: 0, endHour: 9, endMin: 0, patient: 'Kovács Levente', doctor: 'Dr. Harmathy Béla', color: 'green', patientId: '223456789', phone: '+36 70 123 4567', email: 'kovacs.l@mail.com', room: '1-es rendelő', notes: 'All-on-4 érdekli', tags: ['KONZULTÁCIÓ'] },
-  // Wednesday
-  { id: 'e10', day: 2, startHour: 9, startMin: 30, endHour: 11, endMin: 0, patient: 'Galambos Eszter', doctor: 'Dr. Kardos Árpád', category: 'fogszabályozás', color: 'blue', patientId: '223456790', phone: '+36 70 234 5678', email: 'galambos.e@mail.com', room: '3-as rendelő' },
-  { id: 'e11', day: 2, startHour: 11, startMin: 0, endHour: 12, endMin: 0, patient: 'Soós Marcell', doctor: 'Dr. Kardos Árpád', color: 'blue', patientId: '223456791', phone: '+36 70 345 6789', email: 'soos.m@mail.com', room: '3-as rendelő' },
-  { id: 'e12', day: 2, startHour: 13, startMin: 0, endHour: 14, endMin: 30, patient: 'Harmath Tamás', doctor: 'Dr. Kardos Árpád', category: 'melásgör', color: 'blue', patientId: '223456792', phone: '+36 70 456 7890', email: 'harmath.t@mail.com', room: '3-as rendelő' },
-  { id: 'e13', day: 2, startHour: 14, startMin: 30, endHour: 16, endMin: 0, patient: 'Dr. Berényi Nikolett', doctor: 'Dr. Harmathy Béla', category: 'fogszabályozás', color: 'green', patientId: '223456793', phone: '+36 70 567 8901', email: 'berenyi.n@mail.com', room: '1-es rendelő' },
-  // Thursday
-  { id: 'e14', day: 3, startHour: 8, startMin: 30, endHour: 11, endMin: 0, patient: 'Eschbach, Anna', doctor: 'Dr. Varga Péter', category: 'All-on-4', color: 'orange', patientId: '223456794', phone: '+36 70 678 9012', email: 'eschbach.a@mail.com', room: '5-ös rendelő' },
-  { id: 'e15', day: 3, startHour: 11, startMin: 0, endHour: 12, endMin: 0, patient: 'Becker, Wolfgang', doctor: 'Dr. Varga Péter', color: 'orange', patientId: '223456795', phone: '+36 70 789 0123', email: 'becker.w@mail.com', room: '5-ös rendelő' },
-  { id: 'e16', day: 3, startHour: 12, startMin: 0, endHour: 13, endMin: 30, patient: 'Ashe, Hannah', doctor: 'Dr. Varga Péter', category: 'kontroll', color: 'orange', patientId: '223456796', phone: '+36 70 890 1234', email: 'ashe.h@mail.com', room: '5-ös rendelő' },
-  { id: 'e17', day: 3, startHour: 14, startMin: 0, endHour: 17, endMin: 0, patient: 'Sommer, Elke', doctor: 'Dr. Varga Péter', category: 'All-on-4', color: 'orange', patientId: '223456797', phone: '+36 70 901 2345', email: 'sommer.e@mail.com', room: '5-ös rendelő' },
-  // Saturday
-  { id: 'e18', day: 5, startHour: 8, startMin: 0, endHour: 8, endMin: 30, patient: '', doctor: '', category: 'Zárva vagyunk (műszaki ok)', color: 'red' },
-];
-
-/* ─── Filter data ─── */
-const DOCTORS = ['Dr. Fóti Ágota', 'Dr. Harmathy Béla', 'Dr. Kardos Árpád', 'Dr. Kiss Orsolya', 'Dr. László Péter', 'Dr. Moór Izabella', 'Dr. Varga Péter'];
-const HYGIENISTS = ['Antal Ivett', 'Németh Lilla'];
-const ROOMS = ['1-es rendelő', '2-es rendelő', '3-as rendelő', '4-es rendelő', '5-ös rendelő', 'Tárgyaló'];
-const NATIONALITIES = ['magyar', 'német', 'angol', 'francia', 'izlandi'];
+/* ─── Color map for appointment types ─── */
+const TYPE_COLORS: Record<string, CalendarColor> = {
+  consultation: 'blue',
+  treatment: 'green',
+  followup: 'lilac',
+  emergency: 'red',
+  hygiene: 'magenta',
+  surgery: 'orange',
+  implant: 'green',
+  prosthetics: 'orange',
+};
 
 /* ─── Helper: time → pixel offset ─── */
 const BASE_HOUR = 8;
@@ -90,7 +67,6 @@ function layoutEvents(events: CalendarEvent[]): (CalendarEvent & { col: number; 
   const result: (CalendarEvent & { col: number; totalCols: number })[] = [];
   const groups: CalendarEvent[][] = [];
 
-  // Group overlapping events
   let currentGroup: CalendarEvent[] = [sorted[0]];
   let groupEnd = timeToMinutes(sorted[0].endHour, sorted[0].endMin);
 
@@ -109,7 +85,6 @@ function layoutEvents(events: CalendarEvent[]): (CalendarEvent & { col: number; 
   groups.push(currentGroup);
 
   for (const group of groups) {
-    // Assign columns within each group
     const columns: CalendarEvent[][] = [];
     for (const ev of group) {
       const evStart = timeToMinutes(ev.startHour, ev.startMin);
@@ -143,10 +118,11 @@ for (let h = 8; h <= 18; h++) {
 /* ─── Date picker helpers ─── */
 const WEEKDAY_LABELS = ['H', 'K', 'SZ', 'CS', 'P', 'Szo', 'V'];
 const MONTH_NAMES = ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'];
+const DAY_NAMES = ['HÉTFŐ', 'KEDD', 'SZERDA', 'CSÜTÖRTÖK', 'PÉNTEK', 'SZOMBAT'];
 
 function getCalendarGrid(year: number, month: number): (number | null)[][] {
   const firstDay = new Date(year, month, 1);
-  let startDay = firstDay.getDay() - 1; // Mon=0
+  let startDay = firstDay.getDay() - 1;
   if (startDay < 0) startDay = 6;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const daysInPrev = new Date(year, month, 0).getDate();
@@ -159,11 +135,11 @@ function getCalendarGrid(year: number, month: number): (number | null)[][] {
     for (let c = 0; c < 7; c++) {
       const idx = r * 7 + c;
       if (idx < startDay) {
-        row.push(-(daysInPrev - startDay + idx + 1)); // negative = prev month
+        row.push(-(daysInPrev - startDay + idx + 1));
       } else if (day <= daysInMonth) {
         row.push(day++);
       } else {
-        row.push(-(100 + nextDay++)); // negative > 100 = next month
+        row.push(-(100 + nextDay++));
       }
     }
     rows.push(row);
@@ -173,13 +149,152 @@ function getCalendarGrid(year: number, month: number): (number | null)[][] {
 
 export default function NaptarPage() {
   const [filterOpen, setFilterOpen] = useState(false);
-  const [activeNav, setActiveNav] = useState('naptar');
   const [datePickerOpen, setDatePickerOpen] = useState(false);
-  const [pickerMonth, setPickerMonth] = useState(2); // March = 2
-  const [pickerYear, setPickerYear] = useState(2026);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [currentWeekStart, setCurrentWeekStart] = useState(() =>
+    startOfWeek(new Date(), { weekStartsOn: 1 })
+  );
+  const [pickerMonth, setPickerMonth] = useState(new Date().getMonth());
+  const [pickerYear, setPickerYear] = useState(new Date().getFullYear());
+
+  // Data from Supabase
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [doctors, setDoctors] = useState<{ id: string; name: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const supabase = createClient();
+
+  // Generate day headers for current week
+  const days = useMemo(() => {
+    return Array.from({ length: 6 }, (_, i) => {
+      const date = addDays(currentWeekStart, i);
+      return {
+        date: format(date, 'MMMM d.', { locale: hu }),
+        name: DAY_NAMES[i],
+        fullDate: date,
+        isToday: isToday(date),
+      };
+    });
+  }, [currentWeekStart]);
+
+  // Date nav label
+  const weekLabel = useMemo(() => {
+    const end = addDays(currentWeekStart, 5);
+    const startMonth = format(currentWeekStart, 'MMM.', { locale: hu });
+    const endDay = format(end, 'd', { locale: hu });
+    const startDay = format(currentWeekStart, 'd', { locale: hu });
+    const year = format(currentWeekStart, 'yyyy');
+    return `${startMonth} ${startDay}-${endDay}., ${year}`;
+  }, [currentWeekStart]);
 
   const calGrid = useMemo(() => getCalendarGrid(pickerYear, pickerMonth), [pickerYear, pickerMonth]);
+
+  // Fetch appointments for current week
+  useEffect(() => {
+    async function fetchAppointments() {
+      setLoading(true);
+      const weekEnd = addDays(currentWeekStart, 6);
+
+      const { data: appointments, error } = await supabase
+        .from('appointments')
+        .select(`
+          id,
+          start_time,
+          end_time,
+          appointment_type,
+          status,
+          treatment_notes,
+          patient:patients!appointments_patient_id_fkey(id, first_name, last_name, phone, email),
+          doctor:staff!appointments_doctor_id_fkey(id, first_name, last_name),
+          chair:chairs!appointments_chair_id_fkey(name)
+        `)
+        .gte('start_time', currentWeekStart.toISOString())
+        .lt('start_time', weekEnd.toISOString())
+        .order('start_time');
+
+      if (error) {
+        console.error('Error fetching appointments:', error);
+        setLoading(false);
+        return;
+      }
+
+      // Transform to CalendarEvent format
+      const calEvents: CalendarEvent[] = (appointments || []).map((apt: Record<string, unknown>) => {
+        const start = new Date(apt.start_time as string);
+        const end = new Date(apt.end_time as string);
+        const dayOfWeek = start.getDay();
+        const dayIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Mon=0 ... Sun=6
+
+        const patient = apt.patient as Record<string, string> | null;
+        const doctor = apt.doctor as Record<string, string> | null;
+        const chair = apt.chair as Record<string, string> | null;
+
+        return {
+          id: apt.id as string,
+          day: dayIdx,
+          startHour: start.getHours(),
+          startMin: start.getMinutes(),
+          endHour: end.getHours(),
+          endMin: end.getMinutes(),
+          patient: patient ? `${patient.last_name} ${patient.first_name}` : 'Ismeretlen',
+          doctor: doctor ? `Dr. ${doctor.last_name} ${doctor.first_name}` : '',
+          category: apt.appointment_type as string,
+          color: TYPE_COLORS[(apt.appointment_type as string) || 'consultation'] || 'blue',
+          patientId: patient?.id,
+          phone: patient?.phone,
+          email: patient?.email,
+          room: chair?.name,
+          notes: apt.treatment_notes as string | undefined,
+          tags: [(apt.appointment_type as string || '').toUpperCase()],
+          appointmentId: apt.id as string,
+          status: apt.status as string,
+        };
+      });
+
+      setEvents(calEvents);
+      setLoading(false);
+    }
+
+    fetchAppointments();
+
+    // Realtime subscription
+    const channel = supabase
+      .channel('appointments-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'appointments' },
+        () => {
+          fetchAppointments(); // Refetch on any change
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentWeekStart]);
+
+  // Fetch doctors for filter
+  useEffect(() => {
+    async function fetchDoctors() {
+      const { data } = await supabase
+        .from('staff')
+        .select('id, first_name, last_name')
+        .eq('role', 'doctor')
+        .eq('is_active', true)
+        .order('last_name');
+
+      if (data) {
+        setDoctors(data.map(d => ({
+          id: d.id,
+          name: `Dr. ${d.last_name} ${d.first_name}`,
+        })));
+      }
+    }
+    fetchDoctors();
+  }, []);
 
   const handleEventDoubleClick = useCallback((event: CalendarEvent) => {
     setDatePickerOpen(false);
@@ -190,21 +305,52 @@ export default function NaptarPage() {
     setSelectedEvent(null);
   }, []);
 
-  return (
-    <div className={styles.page}>
-      <TopNav
-        items={[
-          { id: 'nyilv', label: 'Nyilvántartás' },
-          { id: 'naptar', label: 'Naptár' },
-          { id: 'dok', label: 'Dokumentumok' },
-          { id: 'crm', label: 'CRM' },
-          { id: 'penzugy', label: 'Pénzügy' },
-          { id: 'riportok', label: 'Riportok' },
-        ]}
-        activeId={activeNav}
-        onSelect={setActiveNav}
-      />
+  const goToPrevWeek = () => setCurrentWeekStart(prev => subWeeks(prev, 1));
+  const goToNextWeek = () => setCurrentWeekStart(prev => addWeeks(prev, 1));
 
+  // Save appointment (create or edit)
+  const handleSaveAppointment = useCallback(async (data: AppointmentFormData, id?: string) => {
+    setSaving(true);
+    const startDT = new Date(`${data.date}T${data.start_time}:00`);
+    const endDT = new Date(`${data.date}T${data.end_time}:00`);
+
+    // Get location_id (use first location)
+    const { data: locations } = await supabase.from('locations').select('id').limit(1);
+    const locationId = locations?.[0]?.id;
+
+    const payload = {
+      patient_id: data.patient_id,
+      doctor_id: data.doctor_id,
+      chair_id: data.chair_id || null,
+      location_id: locationId,
+      start_time: startDT.toISOString(),
+      end_time: endDT.toISOString(),
+      appointment_type: data.appointment_type,
+      treatment_notes: data.treatment_notes || null,
+      status: 'scheduled',
+    };
+
+    if (id) {
+      await supabase.from('appointments').update(payload).eq('id', id);
+    } else {
+      await supabase.from('appointments').insert(payload);
+    }
+
+    setSaving(false);
+    setCreateDrawerOpen(false);
+    setSelectedEvent(null);
+    // Realtime subscription will auto-refresh
+  }, [supabase]);
+
+  // Update appointment status
+  const handleStatusUpdate = useCallback(async (appointmentId: string, newStatus: string) => {
+    await supabase.from('appointments').update({ status: newStatus }).eq('id', appointmentId);
+    // Update local state immediately
+    setSelectedEvent(prev => prev ? { ...prev, status: newStatus } : null);
+  }, [supabase]);
+
+  return (
+    <AppShell>
       <div className={styles.adminBase}>
         {/* Toolbar */}
         <div className={styles.toolbar}>
@@ -222,15 +368,15 @@ export default function NaptarPage() {
           </div>
 
           <div className={styles.dateNav}>
-            <button className={styles.dateNavBtn}><CaretCircleLeft size={32} /></button>
+            <button className={styles.dateNavBtn} onClick={goToPrevWeek}><CaretCircleLeft size={32} /></button>
             <span
               className={styles.dateNavLabel}
               onClick={() => { setDatePickerOpen(o => !o); setSelectedEvent(null); }}
               style={{ cursor: 'pointer' }}
             >
-              Márc. 2-8., 2026
+              {weekLabel}
             </span>
-            <button className={styles.dateNavBtn}><CaretCircleRight size={32} /></button>
+            <button className={styles.dateNavBtn} onClick={goToNextWeek}><CaretCircleRight size={32} /></button>
 
             {/* Date picker popup */}
             {datePickerOpen && (
@@ -242,7 +388,7 @@ export default function NaptarPage() {
                   >
                     <CaretLeft size={16} weight="bold" />
                   </button>
-                  <span className={styles.datePickerTitle}>{MONTH_NAMES[pickerMonth]}</span>
+                  <span className={styles.datePickerTitle}>{MONTH_NAMES[pickerMonth]} {pickerYear}</span>
                   <button
                     className={styles.datePickerNav}
                     onClick={() => { if (pickerMonth === 11) { setPickerMonth(0); setPickerYear(y => y + 1); } else setPickerMonth(m => m + 1); }}
@@ -259,12 +405,19 @@ export default function NaptarPage() {
                       {row.map((day, ci) => {
                         const isCurrentMonth = day !== null && day > 0;
                         const displayDay = day === null ? '' : day < -100 ? Math.abs(day) - 100 : day < 0 ? Math.abs(day) : day;
-                        const isToday = isCurrentMonth && day === 3 && pickerMonth === 2;
+                        const todayDate = new Date();
+                        const isTodayDay = isCurrentMonth && day === todayDate.getDate() && pickerMonth === todayDate.getMonth() && pickerYear === todayDate.getFullYear();
                         return (
                           <button
                             key={ci}
-                            className={`${styles.datePickerDay} ${!isCurrentMonth ? styles.datePickerDayOther : ''} ${isToday ? styles.datePickerDayToday : ''}`}
-                            onClick={() => setDatePickerOpen(false)}
+                            className={`${styles.datePickerDay} ${!isCurrentMonth ? styles.datePickerDayOther : ''} ${isTodayDay ? styles.datePickerDayToday : ''}`}
+                            onClick={() => {
+                              if (isCurrentMonth && day) {
+                                const selectedDate = new Date(pickerYear, pickerMonth, day);
+                                setCurrentWeekStart(startOfWeek(selectedDate, { weekStartsOn: 1 }));
+                              }
+                              setDatePickerOpen(false);
+                            }}
                           >
                             {displayDay}
                           </button>
@@ -277,7 +430,7 @@ export default function NaptarPage() {
             )}
           </div>
 
-          <button className={styles.addBtn}>
+          <button className={styles.addBtn} onClick={() => { setCreateDrawerOpen(true); setSelectedEvent(null); setDatePickerOpen(false); }}>
             <PlusCircle size={54} weight="thin" />
           </button>
         </div>
@@ -286,10 +439,9 @@ export default function NaptarPage() {
         <div className={styles.calendarArea}>
           {/* Filter sidebar */}
           <div className={`${styles.filterSidebar} ${!filterOpen ? styles.filterSidebarHidden : ''}`}>
-            <CheckGroup icon={<Users size={14} />} label="ORVOSOK" items={DOCTORS} />
-            <CheckGroup icon={<Users size={14} />} label="DENTÁLHIGIÉNIKUSOK" items={HYGIENISTS} />
-            <CheckGroup icon={<House size={14} />} label="RENDELŐK" items={ROOMS} />
-            <CheckGroup icon={<Flag size={14} />} label="NEMZETISÉG" items={NATIONALITIES} />
+            <CheckGroup icon={<Users size={14} />} label="ORVOSOK" items={doctors.map(d => d.name)} />
+            <CheckGroup icon={<House size={14} />} label="RENDELŐK" items={['1-es szék', '2-es szék', '3-as szék']} />
+            <CheckGroup icon={<Flag size={14} />} label="TÍPUS" items={['Konzultáció', 'Kezelés', 'Kontroll', 'Sürgős', 'Higiénia', 'Sebészet']} />
           </div>
 
           {/* Calendar grid */}
@@ -309,8 +461,8 @@ export default function NaptarPage() {
             <div className={styles.dayColumnsWrapper}>
               {/* Day headers */}
               <div className={styles.dayHeaders}>
-                {DAYS.map((day, i) => (
-                  <div key={i} className={styles.dayHeader}>
+                {days.map((day, i) => (
+                  <div key={i} className={`${styles.dayHeader} ${day.isToday ? styles.dayHeaderToday : ''}`}>
                     <span className={styles.dayHeaderDate}>{day.date}</span>
                     <span className={styles.dayHeaderName}>{day.name}</span>
                   </div>
@@ -319,8 +471,11 @@ export default function NaptarPage() {
 
               {/* Day columns body with events */}
               <div className={styles.dayColumnsBody}>
-                {DAYS.map((_, dayIdx) => {
-                  const dayEvents = EVENTS.filter(e => e.day === dayIdx);
+                {loading && (
+                  <div className={styles.loadingOverlay}>Betöltés...</div>
+                )}
+                {days.map((_, dayIdx) => {
+                  const dayEvents = events.filter(e => e.day === dayIdx);
                   const layouted = layoutEvents(dayEvents);
                   return (
                     <div key={dayIdx} className={styles.dayColumn}>
@@ -378,7 +533,7 @@ export default function NaptarPage() {
                   {selectedEvent.patient}
                   <ArrowSquareOut size={18} className={styles.drawerLink} />
                 </h2>
-                <p className={styles.drawerPatientId}>ID: {selectedEvent.patientId}</p>
+                <p className={styles.drawerPatientId}>ID: {selectedEvent.patientId?.slice(0, 8)}</p>
                 {selectedEvent.phone && (
                   <div className={styles.drawerContact}>
                     <span><Phone size={14} weight="fill" color="var(--color-primary-500)" /> {selectedEvent.phone}</span>
@@ -399,8 +554,8 @@ export default function NaptarPage() {
                       <span key={tag} className={styles.drawerTag}>{tag}</span>
                     ))}
                   </div>
-                  <p className={styles.drawerLabel}>Korábbi időpontok</p>
-                  <p className={styles.drawerText}>Új páciens</p>
+                  <p className={styles.drawerLabel}>Státusz</p>
+                  <p className={styles.drawerText}>{selectedEvent.status || 'scheduled'}</p>
                 </div>
               </div>
 
@@ -411,19 +566,33 @@ export default function NaptarPage() {
                 </div>
                 <div className={styles.drawerSectionBody}>
                   <div className={styles.drawerStatusRow}>
-                    {['Megérkezett', 'Elkezdve', 'Lezárva', 'Lemondva', 'No-show'].map(s => (
-                      <button key={s} className={styles.drawerStatusBtn}>{s}</button>
+                    {[
+                      { label: 'Megérkezett', value: 'arrived' },
+                      { label: 'Elkezdve', value: 'in_progress' },
+                      { label: 'Lezárva', value: 'completed' },
+                      { label: 'Lemondva', value: 'cancelled' },
+                      { label: 'No-show', value: 'no_show' },
+                    ].map(s => (
+                      <button
+                        key={s.value}
+                        className={`${styles.drawerStatusBtn} ${selectedEvent?.status === s.value ? styles.drawerStatusBtnActive : ''}`}
+                        onClick={() => selectedEvent?.appointmentId && handleStatusUpdate(selectedEvent.appointmentId, s.value)}
+                      >
+                        {s.label}
+                      </button>
                     ))}
                   </div>
                   <p className={styles.drawerLabel}>Vizit információk</p>
                   <div className={styles.drawerVisitCard}>
                     <div className={styles.drawerVisitCardHeader}>
                       <CalendarBlank size={16} />
-                      <span>2026. márc. {2 + (selectedEvent.day || 0)}. ({DAYS[selectedEvent.day]?.name?.charAt(0) || 'H'}), {selectedEvent.startHour}:{String(selectedEvent.startMin).padStart(2, '0')}</span>
+                      <span>
+                        {days[selectedEvent.day]?.date} ({days[selectedEvent.day]?.name?.charAt(0)}),{' '}
+                        {selectedEvent.startHour}:{String(selectedEvent.startMin).padStart(2, '0')}
+                      </span>
                       <PencilSimple size={14} className={styles.drawerLink} />
                     </div>
                     <p className={styles.drawerVisitType}>{selectedEvent.category || 'Konzultáció'}</p>
-                    <p className={styles.drawerVisitId}>#{selectedEvent.patientId} <ArrowSquareOut size={12} className={styles.drawerLink} /></p>
                     <p className={styles.drawerVisitDoctor}>{selectedEvent.doctor}</p>
                     <div className={styles.drawerVisitMeta}>
                       <span><Clock size={14} /> {durationToText(selectedEvent)}</span>
@@ -441,8 +610,23 @@ export default function NaptarPage() {
             </div>
           )}
         </div>
+
+        {/* Create appointment drawer */}
+        <Drawer
+          open={createDrawerOpen}
+          onClose={() => setCreateDrawerOpen(false)}
+          title="Új időpont létrehozása"
+          width="wide"
+        >
+          <AppointmentForm
+            defaultDate={format(currentWeekStart, 'yyyy-MM-dd')}
+            onSave={handleSaveAppointment}
+            onCancel={() => setCreateDrawerOpen(false)}
+            saving={saving}
+          />
+        </Drawer>
       </div>
-    </div>
+    </AppShell>
   );
 }
 

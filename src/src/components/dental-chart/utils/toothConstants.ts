@@ -1,4 +1,5 @@
 import type { SurfaceCondition, TreatmentStatus, ToothType, Quadrant } from '../types';
+export type { Quadrant };
 
 /* ── Status → color mapping ── */
 export const STATUS_COLORS: Record<SurfaceCondition, string> = {

@@ -1,0 +1,21 @@
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-neutral-50);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 56px);
+}
+
+.main {
+  flex: 1;
+  padding: var(--space-20);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}

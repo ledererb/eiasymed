@@ -1,0 +1,120 @@
+.loginContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #082432 0%, #0d3a52 50%, #186D98 100%);
+  padding: var(--space-20);
+}
+
+.loginCard {
+  background: var(--color-white);
+  border-radius: var(--radius-16);
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.logoSection {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.logo {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-primary-900);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-neutral-500);
+  margin: 4px 0 0;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-neutral-700);
+}
+
+.input {
+  padding: 12px 14px;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-8);
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--color-primary-900);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(24, 109, 152, 0.12);
+}
+
+.input::placeholder {
+  color: var(--color-neutral-400);
+}
+
+.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-8);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+.submitButton {
+  padding: 12px;
+  background: var(--color-primary-500);
+  color: white;
+  border: none;
+  border-radius: var(--radius-8);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+  margin-top: 4px;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #15607f;
+}
+
+.submitButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-neutral-400);
+  margin: 32px 0 0;
+}

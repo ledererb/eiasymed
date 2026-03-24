@@ -1,0 +1,129 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 4px 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-neutral-700);
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+.row > * {
+  flex: 1;
+}
+
+/* Patient search */
+.patientSearch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-8);
+  background: var(--color-white);
+  transition: border-color 0.2s ease;
+}
+
+.patientSearch:focus-within {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(24, 109, 152, 0.1);
+}
+
+.patientInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--color-primary-900);
+  background: transparent;
+}
+
+.patientInput::placeholder {
+  color: var(--color-neutral-400);
+}
+
+.patientDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-white);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-8);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+.patientOption {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--color-primary-900);
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.patientOption:hover {
+  background: var(--color-neutral-50);
+}
+
+.patientOptionActive {
+  background: #f0f9ff;
+  color: var(--color-primary-500);
+  font-weight: 500;
+}
+
+/* Textarea */
+.textarea {
+  padding: 10px 14px;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-8);
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--color-primary-900);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.textarea:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(24, 109, 152, 0.1);
+}
+
+.textarea::placeholder {
+  color: var(--color-neutral-400);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-neutral-100);
+}

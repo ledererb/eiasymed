@@ -12,6 +12,7 @@ export { IconButton } from './IconButton';
 // Navigation
 export { TopNav } from './TopNav';
 export { SideNav } from './SideNav';
+export { AppShell } from './AppShell';
 export { Tabs } from './Tabs';
 export { TabbedPanel } from './TabbedPanel';
 export { Breadcrumbs } from './Breadcrumbs';
@@ -20,6 +21,8 @@ export { Breadcrumbs } from './Breadcrumbs';
 export { Table, TableRow, TableHeaderCell, TableCell, TableToolbar, ToolbarButton } from './Table';
 export { CalendarEntry } from './CalendarEntry';
 export { TreatmentPlanRow } from './TreatmentPlanRow';
+export { AppointmentForm } from './AppointmentForm';
+export { InvoiceForm } from './InvoiceForm';
 
 // Panels
 export { Drawer, PatientMasterDrawer, TreatmentDetailDrawer, TreatmentPlanMasterDrawer } from './Drawer';
