@@ -1,182 +1,614 @@
-/* Patient list page styles */
+/* Nyilvántartás / Páciensek — Visit-centric dashboard */
+/* Matches Figma spec: 406:3884 (base) + 431:3592 (drawer) */
 
+/* ────── Info Panel (stat cards) ────── */
+.infoPanel {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 20px;
+  height: 70px;
+  border: 1px solid white;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: width 0.3s ease;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 170px;
+  min-width: 170px;
+  height: 70px;
+  padding: 20px;
+  border: 1px solid #bfc9cf;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.statLabel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 10px;
+  color: #5f7d95;
+  line-height: normal;
+  text-align: center;
+  width: 100%;
+}
+
+.statValue {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 24px;
+  color: #186d98;
+  line-height: normal;
+  text-align: center;
+  width: 100%;
+}
+
+.statValueSmall {
+  composes: statValue;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.dateCard {
+  composes: statCard;
+  background: linear-gradient(232.03deg, rgba(192, 251, 250, 0.5) 8.26%, rgba(255, 241, 249, 0.5) 63.53%, rgba(255, 229, 244, 0.5) 115.32%);
+  gap: 10px;
+}
+
+.dateLabel {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 10px;
+  color: #082432;
+  text-align: center;
+  width: 139px;
+}
+
+.dateValue {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 24px;
+  color: #186d98;
+  line-height: normal;
+  text-align: center;
+}
+
+.collapseBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #5f7d95;
+  transition: color 0.15s;
+}
+
+.collapseBtn:hover {
+  color: #186d98;
+}
+
+/* ────── Toolbar ────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+  padding: 8px 0;
+}
+
+.toolbarBtn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #cfcfcf;
+  border-radius: 7px;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  color: #5f7d95;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.toolbarBtn:hover {
+  border-color: #186d98;
+  color: #186d98;
+}
+
+.toolbarBtn.active {
+  border-color: #186d98;
+  background: #f0f9ff;
+  color: #186d98;
+}
+
+.toolbarLabel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: #5f7d95;
+  margin-left: auto;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 7px;
+  transition: color 0.15s;
+}
+
+.toolbarLabel:hover {
+  color: #186d98;
+}
+
+.searchExpanded {
+  flex: 1;
+  max-width: 320px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  border: 1px solid #186d98;
+  border-radius: 7px;
+  padding: 0 12px;
+  background: white;
+}
+
+.searchExpanded input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: #082432;
+  background: transparent;
+}
+
+.searchExpanded input::placeholder {
+  color: #bfc9cf;
+}
+
+/* ────── Table ────── */
+.tableWrap {
+  background: white;
+  border-radius: 0 0 20px 20px;
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #f5f5f5;
+  padding: 0 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.th {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: #5f7d95;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.thLeft {
+  composes: th;
+  justify-content: flex-start;
+  padding: 0 15px;
+}
+
+/* Column widths matching Figma */
+.colN       { width: 50px; }
+.colPatient { width: 250px; }
+.colStatus  { width: 140px; }
+.colTime    { width: 140px; }
+.colDuration{ width: 170px; }
+.colDoctor  { width: 170px; }
+.colLabels  { width: 170px; }
+.colFee     { width: 170px; }
+.colActions { width: 50px; }
+
+/* ────── Table Rows ────── */
+.tableBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 10px;
+}
+
+.tableRow {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 10px;
+  border-bottom: 1px solid #d9d9d9;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  min-height: 70px;
+}
+
+.tableRow:hover {
+  background: #f8f8f8;
+}
+
+.tableRow.selected {
+  background: #fff1f9;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+/* ────── Cell styles ────── */
+.cell {
+  display: flex;
+  align-items: center;
+  height: 70px;
+  flex-shrink: 0;
+}
+
+.cellCenter {
+  composes: cell;
+  justify-content: center;
+}
+
+.cellRight {
+  composes: cell;
+  justify-content: flex-end;
+  padding: 0 15px;
+}
+
+/* Patient cell */
+.patientCell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 70px;
+  padding: 0 15px 0 15px;
+  overflow: hidden;
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.patientName {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  color: #082432;
+  line-height: 25px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.patientId {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #5f7d95;
+  line-height: 25px;
+}
+
+/* Appointment time cell */
+.timeCell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 70px;
+  padding: 0 15px;
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.timeValue {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 20px;
+  color: #186d98;
+  line-height: 25px;
+}
+
+.timeDate {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #082432;
+  line-height: 25px;
+}
+
+/* Duration/room cell */
+.durationCell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 70px;
+  padding: 0 15px 0 12px;
+  width: 170px;
+  flex-shrink: 0;
+}
+
+.durationText {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #082432;
+  line-height: 25px;
+}
+
+/* Doctor/treatment cell */
+.doctorCell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 70px;
+  padding: 0 0 0 12px;
+  width: 170px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.treatmentPill {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 4px 8px;
+  border-radius: 50px;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  white-space: nowrap;
+  line-height: 1;
+  margin-bottom: 2px;
+  width: fit-content;
+}
+
+.doctorName {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  color: black;
+  line-height: normal;
+}
+
+/* Labels/tags cell */
+.labelsCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  padding: 0 15px;
+  width: 170px;
+  flex-shrink: 0;
+}
+
+.labelText {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #082432;
+  line-height: 25px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Fee cell */
+.feeCell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 70px;
+  padding: 0 15px;
+  width: 170px;
+  flex-shrink: 0;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #082432;
+  white-space: nowrap;
+}
+
+/* Actions cell */
+.actionsCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.actionsBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #5f7d95;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.12s;
+}
+
+.actionsBtn:hover {
+  background: #f0f0f0;
+  color: #082432;
+}
+
+/* Nationality flag cell */
+.flagCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.flagIcon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* ────── Quickview Drawer ────── */
+.drawerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 4px 0;
+}
+
+.drawerSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drawerSectionTitle {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 12px;
+  color: #5f7d95;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.drawerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.drawerLabel {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #5f7d95;
+}
+
+.drawerValue {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  color: #082432;
+}
+
+.drawerPatientHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.drawerPatientName {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 20px;
+  color: #082432;
+}
+
+.drawerPatientId {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #5f7d95;
+}
+
+.statusActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.statusActionBtn {
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #d9d9d9;
+  background: white;
+  color: #082432;
+  transition: all 0.15s ease;
+}
+
+.statusActionBtn:hover {
+  border-color: #186d98;
+  color: #186d98;
+}
+
+.statusActionBtn.activeStatus {
+  background: #186d98;
+  color: white;
+  border-color: #186d98;
+}
+
+.paymentCta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  background: #082432;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  margin-top: 8px;
+}
+
+.paymentCta:hover {
+  background: #0a3045;
+}
+
+.divider {
+  height: 1px;
+  background: #d9d9d9;
+  margin: 4px 0;
+}
+
+/* ────── Loading & Empty ────── */
+.loadingState,
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #5f7d95;
+  font-size: 14px;
+  gap: 8px;
+}
+
+/* ────── Page header ────── */
 .pageHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-}
-
-.pageTitle {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--color-primary-900);
-  margin: 0;
-}
-
-.pageSubtitle {
-  font-size: 13px;
-  color: var(--color-neutral-500);
-  margin: 4px 0 0;
-}
-
-/* Search */
-.searchBar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  background: var(--color-white);
-  border: 1px solid var(--color-neutral-200);
-  border-radius: var(--radius-8);
-}
-
-.searchInput {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 14px;
-  font-family: var(--font-family);
-  color: var(--color-primary-900);
-  background: transparent;
-}
-
-.searchInput::placeholder {
-  color: var(--color-neutral-400);
-}
-
-/* Table */
-.tableContainer {
-  background: var(--color-white);
-  border-radius: var(--radius-12);
-  border: 1px solid var(--color-neutral-100);
-  overflow: hidden;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-.table thead th {
-  text-align: left;
-  padding: 12px 16px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--color-neutral-500);
-  background: var(--color-neutral-50);
-  border-bottom: 1px solid var(--color-neutral-100);
-}
-
-.table tbody td {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--color-neutral-50);
-  color: var(--color-primary-900);
-}
-
-.tableRow {
-  transition: background 0.15s ease;
-  cursor: pointer;
-}
-
-.tableRow:hover {
-  background: var(--color-neutral-50);
-}
-
-.patientName {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.nameText {
-  font-weight: 600;
-  color: var(--color-brand-500);
-}
-
-.vipBadge {
-  display: inline-block;
-  padding: 2px 6px;
-  background: #fef3c7;
-  color: #92400e;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.cellWithIcon {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tajCell {
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
-  font-size: 13px;
-  letter-spacing: 0.5px;
-}
-
-.contactCell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.contactItem {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--color-neutral-600);
-}
-
-.dateCell {
-  font-size: 12px;
-  color: var(--color-neutral-500);
-}
-
-.loadingCell,
-.emptyCell {
-  text-align: center;
-  padding: 40px 16px !important;
-  color: var(--color-neutral-400);
-  font-size: 14px;
-}
-
-/* Pagination */
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-
-.paginationBtn {
-  padding: 8px 16px;
-  border: 1px solid var(--color-neutral-200);
-  border-radius: var(--radius-8);
-  background: var(--color-white);
-  color: var(--color-primary-500);
-  font-size: 13px;
-  font-family: var(--font-family);
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.paginationBtn:hover:not(:disabled) {
-  background: var(--color-neutral-50);
-}
-
-.paginationBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.paginationInfo {
-  font-size: 13px;
-  color: var(--color-neutral-500);
+  margin-bottom: 0;
 }

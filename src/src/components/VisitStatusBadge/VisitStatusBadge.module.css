@@ -1,0 +1,73 @@
+/* Visit Status Badge — matches Figma spec exactly */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  padding: 5px 10px;
+  border-radius: 50px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 400;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* no-show? — dashed red border, red text, white bg */
+.noShow {
+  composes: badge;
+  background: white;
+  border: 1px dashed red;
+  color: red;
+}
+
+/* lezárt — solid magenta bg, white text */
+.completed {
+  composes: badge;
+  background: #a2005b;
+  color: white;
+  border: none;
+}
+
+/* megérkezett — pink bg, pink border, pink text */
+.arrived {
+  composes: badge;
+  background: #fff1f9;
+  border: 1px solid #c43284;
+  color: #c43284;
+}
+
+/* elkezdve — teal bg, white text */
+.inProgress {
+  composes: badge;
+  background: #186d98;
+  color: white;
+  border: none;
+}
+
+/* scheduled/upcoming — plain text, no badge */
+.scheduled {
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 400;
+  color: #082432;
+  white-space: nowrap;
+}
+
+/* confirmed — subtle outline */
+.confirmed {
+  composes: badge;
+  background: #f0fdf4;
+  border: 1px solid #22c55e;
+  color: #15803d;
+}
+
+/* cancelled */
+.cancelled {
+  composes: badge;
+  background: #f5f5f5;
+  border: 1px solid #cfcfcf;
+  color: #5f7d95;
+  text-decoration: line-through;
+}
