@@ -6,7 +6,7 @@ import {
   MagnifyingGlass, FunnelSimple, SortAscending, Columns,
   DotsThree, CaretDoubleLeft, CaretDoubleRight,
   CurrencyCircleDollar, Clock, CalendarBlank,
-  Plus, User, Tag, ShieldCheck
+  Plus, User, Tag, ShieldCheck, Pencil, Trash, CalendarPlus, ClipboardText
 } from '@phosphor-icons/react';
 import { AppShell } from '@/components/AppShell';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -91,6 +91,7 @@ export default function PaciensekPage() {
     smsNotify: false, emailNotify: false,
   });
   const [saving, setSaving] = useState(false);
+  const [actionsOpenId, setActionsOpenId] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -415,13 +416,33 @@ export default function PaciensekPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className={styles.actionsCell}>
+                  <div className={styles.actionsCell} style={{ position: 'relative' }}>
                     <button
                       className={styles.actionsBtn}
-                      onClick={(e) => { e.stopPropagation(); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActionsOpenId(actionsOpenId === a.id ? null : a.id);
+                      }}
                     >
                       <DotsThree size={20} weight="bold" />
                     </button>
+                    {actionsOpenId === a.id && (
+                      <div className={styles.actionsDropdown} onClick={(e) => e.stopPropagation()}>
+                        <button className={styles.actionItem} onClick={() => { setSelectedId(a.id); setActionsOpenId(null); }}>
+                          <Pencil size={14} /> Szerkesztés
+                        </button>
+                        <button className={styles.actionItem} onClick={() => { router.push('/naptar'); setActionsOpenId(null); }}>
+                          <CalendarPlus size={14} /> Új időpont
+                        </button>
+                        <button className={styles.actionItem} onClick={() => { router.push('/paciensek/ajanlatok'); setActionsOpenId(null); }}>
+                          <ClipboardText size={14} /> Kezelési terv
+                        </button>
+                        <div className={styles.actionDivider} />
+                        <button className={`${styles.actionItem} ${styles.actionDanger}`} onClick={() => setActionsOpenId(null)}>
+                          <Trash size={14} /> Törlés
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
