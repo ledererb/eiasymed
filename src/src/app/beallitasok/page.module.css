@@ -1,0 +1,211 @@
+/* Settings / Beállítások page styles */
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary-900);
+  margin: 0;
+}
+
+.pageSubtitle {
+  font-size: 13px;
+  color: var(--color-neutral-500);
+  margin: 4px 0 0;
+}
+
+.emptyMessage {
+  text-align: center;
+  color: var(--color-neutral-400);
+  padding: 40px;
+  font-size: 14px;
+}
+
+/* Staff/Location cards grid */
+.staffGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.staffCard {
+  display: flex;
+  gap: 14px;
+  padding: 20px;
+  background: var(--color-white);
+  border-radius: var(--radius-12);
+  border: 1px solid var(--color-neutral-100);
+  position: relative;
+  transition: all 0.2s ease;
+}
+.staffCard:hover {
+  border-color: var(--color-primary-200);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.staffInactive { opacity: 0.5; }
+
+.staffAvatar { flex-shrink: 0; }
+
+.staffInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.staffName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-primary-900);
+  margin: 0;
+}
+
+.staffRole {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary-500);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.staffSpec {
+  font-size: 12px;
+  color: var(--color-neutral-500);
+}
+
+.staffContact {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-neutral-500);
+}
+
+.staffActions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.iconBtn {
+  width: 28px; height: 28px;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-8);
+  background: var(--color-white);
+  color: var(--color-neutral-500);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.iconBtn:hover {
+  border-color: var(--color-primary-500);
+  color: var(--color-primary-500);
+}
+
+/* Working hours */
+.hoursLayout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 20px;
+  background: var(--color-white);
+  border-radius: var(--radius-12);
+  border: 1px solid var(--color-neutral-100);
+  padding: 20px;
+}
+
+.hoursSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-right: 1px solid var(--color-neutral-100);
+  padding-right: 16px;
+}
+
+.hoursSidebarLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--color-neutral-500);
+  font-weight: 600;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+
+.hoursStaffBtn {
+  text-align: left;
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--radius-8);
+  background: none;
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: var(--color-primary-900);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.hoursStaffBtn:hover { background: var(--color-neutral-50); }
+.hoursStaffBtnActive {
+  background: var(--color-primary-500);
+  color: var(--color-white);
+  font-weight: 600;
+}
+
+.hoursGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hourRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  border-radius: var(--radius-8);
+  background: var(--color-neutral-50);
+  transition: all 0.15s ease;
+}
+.hourRowActive {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.hourDayLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 120px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary-900);
+  cursor: pointer;
+}
+
+.hourTimes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-neutral-600);
+}
+
+.timeInput {
+  padding: 4px 8px;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-4);
+  font-family: var(--font-family);
+  font-size: 13px;
+  outline: none;
+}
+.timeInput:focus { border-color: var(--color-primary-500); }
+
+.hourOff {
+  font-size: 12px;
+  color: var(--color-neutral-400);
+  font-style: italic;
+}

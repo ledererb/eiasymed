@@ -47,6 +47,7 @@ const NAV_TO_ROUTE: Record<string, string> = {
   'dental-tourism': '/dental-tourism',
   riportok: '/riportok',
   'dental-chart': '/dental-chart',
+  settings: '/beallitasok',
 };
 
 const TOP_NAV_TO_ROUTE: Record<string, string> = {
@@ -71,6 +72,7 @@ function getActiveTopNavFromPath(pathname: string): string {
   if (segment === 'crm') return 'crm';
   if (segment === 'penzugy') return 'penzugy';
   if (segment === 'riportok') return 'riportok';
+  if (segment === 'beallitasok') return 'beallitasok';
   return 'naptar';
 }
 
