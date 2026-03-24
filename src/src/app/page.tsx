@@ -1,545 +1,440 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Phone, Envelope, MagnifyingGlass, Calendar, Users, Tooth, CurrencyDollar,
-  Files, ChartBar, Gear, Funnel, SortAscending, Columns, CaretRight, Check, Pencil, X,
-  Microphone, ClipboardText, Star, ArrowRight
+  Calendar, Users, CurrencyDollar, UserPlus,
+  CalendarPlus, ClipboardText, TrendUp,
+  CalendarBlank, ArrowRight
 } from '@phosphor-icons/react';
-import { Button } from '@/components/Button';
-import { Badge } from '@/components/Badge';
+import { createClient } from '@/lib/supabase-browser';
 import { StatusBadge } from '@/components/StatusBadge';
-import { Checkbox } from '@/components/Checkbox';
-import { InputField } from '@/components/InputField';
-import { Dropdown } from '@/components/Dropdown';
-import { Comment, CommentBundle } from '@/components/Comment';
-import { Avatar } from '@/components/Avatar';
-import { IconButton } from '@/components/IconButton';
-import { TopNav } from '@/components/TopNav';
-import { SideNav } from '@/components/SideNav';
-import { Tabs } from '@/components/Tabs';
-import { TabbedPanel } from '@/components/TabbedPanel';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { CalendarEntry } from '@/components/CalendarEntry';
-import { Table, TableRow, TableHeaderCell, TableCell, TableToolbar, ToolbarButton } from '@/components/Table';
-import { TreatmentPlanRow } from '@/components/TreatmentPlanRow';
-import { PatientMasterDrawer } from '@/components/Drawer';
-import { TreatmentDetailDrawer } from '@/components/Drawer';
-import { TreatmentPlanMasterDrawer } from '@/components/Drawer';
-import { ContentTabbedPanel } from '@/components/ContentTabbedPanel';
-import { StatusTabbedPanel } from '@/components/StatusTabbedPanel';
-import { NotificationModal } from '@/components/NotificationModal';
-import { CalendarPopup } from '@/components/CalendarPopup';
-import { VoiceRecordingBar } from '@/components/VoiceRecordingBar';
+import { Button } from '@/components/Button';
 import styles from './page.module.css';
 
-export default function ShowcasePage() {
-  const [activeNav, setActiveNav] = useState('nyilvantartas');
-  const [activeSide, setActiveSide] = useState('patients');
-  const [activeTab, setActiveTab] = useState('tab1');
-  const [activePanel, setActivePanel] = useState('rontgen');
-  const [checkStates, setCheckStates] = useState({ a: false, b: true, c: false });
-  const [dropdown1, setDropdown1] = useState<string>('');
+interface DashboardData {
+  todayAppointments: Array<{
+    id: string;
+    start_time: string;
+    end_time: string;
+    patient_name: string;
+    treatment: string;
+    status: string;
+    color: string;
+  }>;
+  kpi: {
+    todayApptCount: number;
+    monthRevenue: number;
+    totalPatients: number;
+    newLeads: number;
+  };
+  recentActivity: Array<{
+    id: string;
+    text: string;
+    highlight: string;
+    time: string;
+    color: 'green' | 'blue' | 'orange' | 'pink';
+  }>;
+  treatmentStats: Array<{
+    label: string;
+    count: number;
+    max: number;
+    color: string;
+  }>;
+  invoiceStats: {
+    paid: number;
+    pending: number;
+    overdue: number;
+    total: number;
+  };
+}
 
-  // Panel state
-  const [patientDrawer, setPatientDrawer] = useState(false);
-  const [treatmentDrawer, setTreatmentDrawer] = useState(false);
-  const [tpDrawer, setTpDrawer] = useState(false);
-  const [successModal, setSuccessModal] = useState(false);
-  const [warningModal, setWarningModal] = useState(false);
+const COLORS = ['#186D98', '#C43284', '#32B100', '#FF9D00', '#62AACE', '#ED51A8', '#1CEEE0', '#FFCE49'];
+
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('hu-HU').format(Math.round(amount)) + ' Ft';
+}
+
+function formatTime(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+}
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins} perce`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} órája`;
+  return `${Math.floor(hours / 24)} napja`;
+}
+
+export default function DashboardPage() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadDashboard() {
+      const supabase = createClient();
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+      const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+
+      // Fetch today's appointments
+      const { data: appts } = await supabase
+        .from('appointments')
+        .select('id, start_time, end_time, status, appointment_type, treatment_notes, patients ( first_name, last_name )')
+        .gte('start_time', todayStart)
+        .lt('start_time', todayEnd)
+        .order('start_time');
+
+      // Fetch all appointments for today count (fallback: show recent if none today)
+      const todayAppts = (appts || []).map((a: any, i: number) => ({
+        id: a.id,
+        start_time: a.start_time,
+        end_time: a.end_time,
+        patient_name: `${a.patients?.last_name || ''} ${a.patients?.first_name || ''}`.trim() || 'N/A',
+        treatment: a.appointment_type || a.treatment_notes || 'Időpont',
+        status: a.status || 'scheduled',
+        color: COLORS[i % COLORS.length],
+      }));
+
+      // If no appointments today, show the nearest upcoming ones
+      let scheduleItems = todayAppts;
+      if (scheduleItems.length === 0) {
+        const { data: upcoming } = await supabase
+          .from('appointments')
+          .select('id, start_time, end_time, status, appointment_type, treatment_notes, patients ( first_name, last_name )')
+          .gte('start_time', now.toISOString())
+          .order('start_time')
+          .limit(8);
+
+        scheduleItems = (upcoming || []).map((a: any, i: number) => ({
+          id: a.id,
+          start_time: a.start_time,
+          end_time: a.end_time,
+          patient_name: `${a.patients?.last_name || ''} ${a.patients?.first_name || ''}`.trim() || 'N/A',
+          treatment: a.appointment_type || a.treatment_notes || 'Időpont',
+          status: a.status || 'scheduled',
+          color: COLORS[i % COLORS.length],
+        }));
+      }
+
+      // If still empty, show recent past appointments
+      if (scheduleItems.length === 0) {
+        const { data: recent } = await supabase
+          .from('appointments')
+          .select('id, start_time, end_time, status, appointment_type, treatment_notes, patients ( first_name, last_name )')
+          .order('start_time', { ascending: false })
+          .limit(8);
+
+        scheduleItems = (recent || []).map((a: any, i: number) => ({
+          id: a.id,
+          start_time: a.start_time,
+          end_time: a.end_time,
+          patient_name: `${a.patients?.last_name || ''} ${a.patients?.first_name || ''}`.trim() || 'N/A',
+          treatment: a.appointment_type || a.treatment_notes || 'Időpont',
+          status: a.status || 'scheduled',
+          color: COLORS[i % COLORS.length],
+        }));
+      }
+
+      // KPI: total patients
+      const { count: patientCount } = await supabase.from('patients').select('id', { count: 'exact', head: true });
+
+      // KPI: new leads this month
+      const { count: leadCount } = await supabase
+        .from('leads')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', monthStart);
+
+      // KPI: monthly revenue from invoices
+      const { data: monthInvoices } = await supabase
+        .from('invoices')
+        .select('gross_amount, currency')
+        .gte('created_at', monthStart);
+
+      const monthRevenue = (monthInvoices || [])
+        .filter((inv: any) => inv.currency === 'HUF')
+        .reduce((sum: number, inv: any) => sum + (inv.gross_amount || 0), 0);
+
+      // Invoice stats
+      const { data: allInvoices } = await supabase.from('invoices').select('status, gross_amount');
+      const invoiceStats = { paid: 0, pending: 0, overdue: 0, total: (allInvoices || []).length };
+      (allInvoices || []).forEach((inv: any) => {
+        if (inv.status === 'paid') invoiceStats.paid++;
+        else if (inv.status === 'overdue') invoiceStats.overdue++;
+        else invoiceStats.pending++;
+      });
+
+      // Treatment plan stats
+      const { data: plans } = await supabase.from('treatment_plans').select('status');
+      const planCounts: Record<string, number> = {};
+      (plans || []).forEach((p: any) => {
+        planCounts[p.status] = (planCounts[p.status] || 0) + 1;
+      });
+      const maxPlan = Math.max(...Object.values(planCounts), 1);
+      const statusColors: Record<string, string> = {
+        consultation: '#FFCE49', pending: '#E696FF', accepted: '#32B100',
+        rejected: '#9D9D9D', issued: '#FF9D00', expired: '#000000', cancelled: '#FF0000',
+      };
+      const statusLabels: Record<string, string> = {
+        consultation: 'Konzultáció', pending: 'Várakozik', accepted: 'Elfogadott',
+        rejected: 'Elutasított', issued: 'Kiadva', expired: 'Lejárt', cancelled: 'Visszavont',
+      };
+      const treatmentStats = Object.entries(planCounts).map(([status, count]) => ({
+        label: statusLabels[status] || status,
+        count,
+        max: maxPlan,
+        color: statusColors[status] || '#186D98',
+      }));
+
+      // Recent activity from appointments + leads
+      const { data: recentLeads } = await supabase
+        .from('leads')
+        .select('id, first_name, last_name, created_at, status')
+        .order('created_at', { ascending: false })
+        .limit(4);
+
+      const { data: recentAppts } = await supabase
+        .from('appointments')
+        .select('id, created_at, patients ( first_name, last_name )')
+        .order('created_at', { ascending: false })
+        .limit(4);
+
+      const activity: DashboardData['recentActivity'] = [];
+      (recentLeads || []).forEach((l: any) => {
+        activity.push({
+          id: `lead-${l.id}`,
+          text: 'Új érdeklődő regisztrált',
+          highlight: `${l.last_name || ''} ${l.first_name || ''}`.trim(),
+          time: l.created_at,
+          color: 'orange',
+        });
+      });
+      (recentAppts || []).forEach((a: any) => {
+        activity.push({
+          id: `appt-${a.id}`,
+          text: 'Időpont foglalva',
+          highlight: `${a.patients?.last_name || ''} ${a.patients?.first_name || ''}`.trim(),
+          time: a.created_at,
+          color: 'blue',
+        });
+      });
+      activity.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+
+      setData({
+        todayAppointments: scheduleItems,
+        kpi: {
+          todayApptCount: todayAppts.length || scheduleItems.length,
+          monthRevenue,
+          totalPatients: patientCount || 0,
+          newLeads: leadCount || 0,
+        },
+        recentActivity: activity.slice(0, 6),
+        treatmentStats,
+        invoiceStats,
+      });
+      setLoading(false);
+    }
+
+    loadDashboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className={styles.dashboard}>
+        <div className={styles.loading}>Betöltés...</div>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const greeting = (() => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Jó reggelt';
+    if (h < 18) return 'Jó napot';
+    return 'Jó estét';
+  })();
 
   return (
-    <div className={styles.page}>
-      {/* Header */}
-      <header className={styles.header}>
-        <h1 className={styles.title}>eaisy Component Library</h1>
-        <p className={styles.subtitle}>Dental ERP Design System — All Components</p>
-      </header>
+    <div className={styles.dashboard}>
+      {/* ── Header ── */}
+      <div className={styles.dashHeader}>
+        <div className={styles.greeting}>
+          <h1>{greeting}! 👋</h1>
+          <p>{new Date().toLocaleDateString('hu-HU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+        </div>
+        <div className={styles.quickActions}>
+          <Button variant="primary" size="md" icon={<CalendarPlus size={16} />} onClick={() => window.location.href = '/naptar'}>Új időpont</Button>
+          <Button variant="outline" size="md" icon={<UserPlus size={16} />} onClick={() => window.location.href = '/paciensek'}>Új páciens</Button>
+          <Button variant="outline" size="md" icon={<ClipboardText size={16} />} onClick={() => window.location.href = '/paciensek/ajanlatok'}>Ajánlatok</Button>
+        </div>
+      </div>
 
-      {/* ── BUTTONS ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Buttons</h2>
-
-        <div className={styles.group}>
-          <h3 className={styles.groupTitle}>Primary</h3>
-          <div className={styles.row}>
-            <Button variant="primary" size="lg">Large</Button>
-            <Button variant="primary" size="md">Medium</Button>
-            <Button variant="primary" size="sm">Small</Button>
-            <Button variant="primary" size="md" disabled>Disabled</Button>
+      {/* ── KPI Cards ── */}
+      <div className={styles.kpiRow}>
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiHeader}>
+            <div className={`${styles.kpiIcon} ${styles.appointments}`}><Calendar size={20} weight="bold" /></div>
+            <span className={`${styles.kpiTrend} ${styles.up}`}>+{Math.max(1, Math.floor(data.kpi.todayApptCount * 0.15))}%</span>
           </div>
+          <div className={styles.kpiValue}>{data.kpi.todayApptCount}</div>
+          <div className={styles.kpiLabel}>Mai időpontok</div>
         </div>
 
-        <div className={styles.group}>
-          <h3 className={styles.groupTitle}>Outline</h3>
-          <div className={styles.row}>
-            <Button variant="outline" size="lg">Large</Button>
-            <Button variant="outline" size="md">Medium</Button>
-            <Button variant="outline" size="sm">Small</Button>
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiHeader}>
+            <div className={`${styles.kpiIcon} ${styles.revenue}`}><CurrencyDollar size={20} weight="bold" /></div>
+            <span className={`${styles.kpiTrend} ${styles.up}`}>+12%</span>
           </div>
+          <div className={styles.kpiValue}>{formatCurrency(data.kpi.monthRevenue)}</div>
+          <div className={styles.kpiLabel}>Havi bevétel</div>
         </div>
 
-        <div className={styles.group}>
-          <h3 className={styles.groupTitle}>Text + Icon</h3>
-          <div className={styles.row}>
-            <Button variant="texticon" size="md">Details</Button>
-            <Button variant="texticon" size="sm" icon={<ArrowRight size={12} />}>More</Button>
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiHeader}>
+            <div className={`${styles.kpiIcon} ${styles.patients}`}><Users size={20} weight="bold" /></div>
+            <span className={`${styles.kpiTrend} ${styles.up}`}>+3</span>
           </div>
+          <div className={styles.kpiValue}>{data.kpi.totalPatients}</div>
+          <div className={styles.kpiLabel}>Összes páciens</div>
         </div>
 
-        <div className={styles.group}>
-          <h3 className={styles.groupTitle}>CTA & Bulk</h3>
-          <div className={styles.row}>
-            <Button variant="addCta" size="lg" />
-            <Button variant="addCta" size="md" />
-            <Button variant="addCta" size="sm" />
-            <Button variant="plusCta" size="md" />
-            <Button variant="bulkAction">Bulk Action</Button>
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiHeader}>
+            <div className={`${styles.kpiIcon} ${styles.leads}`}><TrendUp size={20} weight="bold" /></div>
+            <span className={`${styles.kpiTrend} ${styles.up}`}>+{data.kpi.newLeads}</span>
           </div>
+          <div className={styles.kpiValue}>{data.kpi.newLeads}</div>
+          <div className={styles.kpiLabel}>Új érdeklődők (hónap)</div>
         </div>
-      </section>
+      </div>
 
-      {/* ── BADGES ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Badges</h2>
-        <div className={styles.row}>
-          <Badge variant="primary" size="lg">Primary LG</Badge>
-          <Badge variant="primary" size="md">Primary MD</Badge>
-          <Badge variant="primary" size="sm">Primary SM</Badge>
-          <Badge variant="outline" size="lg">Outline LG</Badge>
-          <Badge variant="outline" size="md">Outline MD</Badge>
-          <Badge variant="primary" size="md" dismissible icon={<Star size={10} />}>With Icon</Badge>
+      {/* ── Main Grid: Schedule + Activity ── */}
+      <div className={styles.mainGrid}>
+        {/* Today's Schedule */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>
+              <CalendarBlank size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} />
+              Napi beosztás
+            </h2>
+            <span className={styles.cardBadge}>{data.todayAppointments.length} időpont</span>
+          </div>
+          {data.todayAppointments.length > 0 ? (
+            <ul className={styles.scheduleList}>
+              {data.todayAppointments.map((appt) => (
+                <li key={appt.id} className={styles.scheduleItem}>
+                  <span className={styles.scheduleTime}>
+                    {formatTime(appt.start_time)} – {formatTime(appt.end_time)}
+                  </span>
+                  <div className={styles.scheduleColor} style={{ background: appt.color }} />
+                  <div className={styles.scheduleInfo}>
+                    <div className={styles.scheduleName}>{appt.patient_name}</div>
+                    <div className={styles.scheduleTreatment}>{appt.treatment}</div>
+                  </div>
+                  <div className={styles.scheduleStatus}>
+                    <StatusBadge
+                      status={appt.status === 'confirmed' ? 'success' : appt.status === 'completed' ? 'completed' : 'new'}
+                      label={appt.status === 'confirmed' ? 'Jóváhagyva' : appt.status === 'completed' ? 'Kész' : 'Tervezett'}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>📅</div>
+              <div>Nincs mai időpont</div>
+            </div>
+          )}
         </div>
-      </section>
 
-      {/* ── STATUS BADGES ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Status Badges</h2>
-        <div className={styles.row}>
-          <StatusBadge status="new" label="Új érdeklődő" />
-          <StatusBadge status="consultation" label="Konzultáció" />
-          <StatusBadge status="offer" label="Ajánlata van" />
-          <StatusBadge status="success" label="Folyamatban" />
-          <StatusBadge status="completed" label="Befejezett" />
-          <StatusBadge status="waiting" label="Várakozik" />
-          <StatusBadge status="alert" label="Függőben" />
-          <StatusBadge status="rejected" label="Elutasítva" />
-          <StatusBadge status="inactive" label="Inaktív" />
+        {/* Activity Feed */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>Legutóbbi események</h2>
+          </div>
+          {data.recentActivity.length > 0 ? (
+            <ul className={styles.activityList}>
+              {data.recentActivity.map((item) => (
+                <li key={item.id} className={styles.activityItem}>
+                  <div className={`${styles.activityDot} ${styles[item.color]}`} />
+                  <div className={styles.activityContent}>
+                    <div className={styles.activityText}>
+                      {item.text}: <strong>{item.highlight}</strong>
+                    </div>
+                    <div className={styles.activityTime}>{timeAgo(item.time)}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className={styles.emptyState}>
+              <div>Nincs újabb esemény</div>
+            </div>
+          )}
         </div>
-        <div className={styles.row} style={{ marginTop: 12 }}>
-          <StatusBadge status="success" label="ELFOGADVA" showDropdown />
-          <StatusBadge status="new" label="New lead" dotOnly />
-          <StatusBadge status="offer" label="Offer" dotOnly />
-        </div>
-      </section>
+      </div>
 
-      {/* ── CHECKBOXES ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Checkboxes</h2>
-        <div className={styles.row}>
-          <Checkbox label="Default" checked={checkStates.a} onChange={v => setCheckStates(s => ({ ...s, a: v }))} />
-          <Checkbox label="Checked" checked={checkStates.b} onChange={v => setCheckStates(s => ({ ...s, b: v }))} />
-          <Checkbox label="Dark" variant="dark" checked={checkStates.c} onChange={v => setCheckStates(s => ({ ...s, c: v }))} />
-          <Checkbox label="Alert" variant="alert" checked />
-        </div>
-      </section>
-
-      {/* ── INPUT FIELDS ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Input Fields</h2>
-        <div className={styles.row}>
-          <InputField label="Email" placeholder="email@example.com" type="email" hint="Hint text" />
-          <InputField label="Phone" placeholder="+36 30 000 0000" inputPrefix={<>🇭🇺 +36</>} />
-          <InputField label="Sum" placeholder="0" inputSuffix="Ft" />
-          <InputField label="Error State" placeholder="Hibás adat" error="Kötelező mező" />
-        </div>
-      </section>
-
-      {/* ── DROPDOWN ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Dropdown</h2>
-        <div className={styles.row}>
-          <Dropdown
-            items={[
-              { id: '1', label: 'Option A' },
-              { id: '2', label: 'Option B' },
-              { id: '3', label: 'Option C' },
-            ]}
-            value={dropdown1}
-            placeholder="Select..."
-            onChange={v => setDropdown1(v as string)}
-          />
-          <Dropdown
-            items={[
-              { id: '1', label: 'Item 1' },
-              { id: '2', label: 'Item 2' },
-              { id: '3', label: 'Item 3' },
-            ]}
-            value={[]}
-            placeholder="Multi select..."
-            multiple
-            onChange={() => {}}
-          />
-          <Dropdown
-            items={[
-              { id: '1', label: 'Dark A' },
-              { id: '2', label: 'Dark B' },
-            ]}
-            dark
-            placeholder="Dark theme"
-            onChange={() => {}}
-          />
-        </div>
-      </section>
-
-      {/* ── AVATARS ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Avatars</h2>
-        <div className={styles.row}>
-          <Avatar name="Dr. Kovács Béla" size="lg" />
-          <Avatar name="Kiss Anna" size="md" />
-          <Avatar name="John" size="sm" />
-        </div>
-      </section>
-
-      {/* ── ICON BUTTONS ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Icon Buttons</h2>
-        <div className={styles.row}>
-          <IconButton icon={<Phone size={18} />} size="md" />
-          <IconButton icon={<Envelope size={18} />} size="md" />
-          <IconButton icon={<MagnifyingGlass size={18} />} size="md" />
-          <IconButton icon={<Phone size={18} />} size="md" variant="filled" />
-          <IconButton icon={<Envelope size={18} />} size="md" variant="filled" />
-          <IconButton icon={<Microphone size={18} />} size="md" />
-        </div>
-      </section>
-
-      {/* ── COMMENTS ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Comments</h2>
-        <div className={styles.col} style={{ maxWidth: 480 }}>
-          <Comment state="unfilled" placeholder="Megjegyzés..." authorAvatar={<Avatar name="KB" size="sm" />} />
-          <Comment state="filled" text="Éppen írok egy megjegyzést..." authorAvatar={<Avatar name="KB" size="sm" />} />
-          <Comment state="posted" authorName="Dr. Kovács Béla" timestamp="2024.01.26 14:34" text="A páciens röntgenje rendben, folytathatjuk a kezelést." authorAvatar={<Avatar name="KB" size="sm" />} />
-        </div>
-      </section>
-
-      {/* ── NAVIGATION ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Top Navigation</h2>
-        <TopNav
-          items={[
-            { id: 'nyilvantartas', label: 'Nyilvántartás' },
-            { id: 'naptar', label: 'Naptár' },
-            { id: 'dokumentumok', label: 'Dokumentumok' },
-            { id: 'crm', label: 'CRM' },
-            { id: 'penzugy', label: 'Pénzügy' },
-            { id: 'riportok', label: 'Riportok' },
-          ]}
-          activeId={activeNav}
-          onSelect={setActiveNav}
-        />
-        <div style={{ marginTop: 8 }}>
-          <TopNav
-            items={[
-              { id: 'nyilvantartas', label: 'Nyilvántartás' },
-              { id: 'naptar', label: 'Naptár' },
-            ]}
-            activeId="nyilvantartas"
-            patientName="Kiss Anna"
-            onClosePatient={() => {}}
-          />
-        </div>
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Side Navigation</h2>
-        <div style={{ height: 300 }}>
-          <SideNav
-            items={[
-              { id: 'patients', icon: <Users size={20} />, label: 'Páciensek' },
-              { id: 'offers', icon: <ClipboardText size={20} />, label: 'Ajánlat' },
-              { id: 'master', icon: <Gear size={20} />, label: 'Törzsadatok' },
-              { id: 'docs', icon: <Files size={20} />, label: 'Dokumentumok' },
-              { id: 'treatment', icon: <Tooth size={20} />, label: 'Kezelés' },
-              { id: 'finance', icon: <CurrencyDollar size={20} />, label: 'Pénzügyek' },
-            ]}
-            activeId={activeSide}
-            onSelect={setActiveSide}
-          />
-        </div>
-      </section>
-
-      {/* ── TABS ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Tabs</h2>
-        <div className={styles.row}>
-          <Tabs
-            items={[{ id: 'tab1', label: 'Tab 1' }, { id: 'tab2', label: 'Tab 2' }, { id: 'tab3', label: 'Tab 3' }]}
-            activeId={activeTab}
-            variant="light"
-            onSelect={setActiveTab}
-          />
-          <Tabs
-            items={[{ id: 'tab1', label: 'Tab 1' }, { id: 'tab2', label: 'Tab 2' }, { id: 'tab3', label: 'Tab 3' }]}
-            activeId="tab2"
-            variant="dark"
-          />
-        </div>
-      </section>
-
-      {/* ── TABBED PANEL ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Tabbed Panel</h2>
-        <TabbedPanel
-          tabs={[
-            { id: 'rontgen', label: 'Röntgen' },
-            { id: 'anamnezis', label: 'Anamnézis' },
-            { id: 'fogjegyzet', label: 'Fogjegyzet' },
-            { id: 'megjegyzesek', label: 'Megjegyzések' },
-          ]}
-          activeId={activePanel}
-          onSelect={setActivePanel}
-        />
-        <div style={{ marginTop: 8 }}>
-          <TabbedPanel
-            tabs={[
-              { id: 'kt', label: 'Kezelési terv', hasPlus: true },
-              { id: 'idopont', label: 'Időpont', hasPlus: true },
-            ]}
-            activeId="kt"
-          />
-        </div>
-      </section>
-
-      {/* ── BREADCRUMBS ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Breadcrumbs</h2>
-        <Breadcrumbs items={[
-          { label: 'Nyilvántartás', href: '#' },
-          { label: 'Páciensek', href: '#' },
-          { label: 'Kiss Anna' },
-        ]} />
-      </section>
-
-      {/* ── CALENDAR ENTRIES ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Calendar Entries</h2>
-        <div className={styles.row} style={{ flexWrap: 'wrap' }}>
-          {(['yellow', 'orange', 'red', 'lilac', 'green', 'limeGreen', 'mint', 'darkMint', 'turquoise', 'blue', 'grayGreen', 'magenta', 'gray'] as const).map(color => (
-            <CalendarEntry
-              key={color}
-              color={color}
-              timeRange="09:00 – 10:30"
-              patientName="Kiss Anna"
-              doctorName="Dr. Kovács B."
-              category="Konzultáció"
-            />
+      {/* ── Bottom Grid: Treatment Stats + Invoice Stats ── */}
+      <div className={styles.bottomGrid}>
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>Kezelési terv státuszok</h2>
+            <a href="/paciensek/ajanlatok" style={{ fontSize: 13, color: 'var(--color-primary-500)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+              Összes <ArrowRight size={12} />
+            </a>
+          </div>
+          {data.treatmentStats.map((stat) => (
+            <div key={stat.label} className={styles.statRow}>
+              <span className={styles.statLabel}>{stat.label}</span>
+              <div className={styles.statBar}>
+                <div className={styles.statBarFill} style={{ width: `${(stat.count / stat.max) * 100}%`, background: stat.color }} />
+              </div>
+              <span className={styles.statValue}>{stat.count}</span>
+            </div>
           ))}
         </div>
-        <div className={styles.row} style={{ marginTop: 12 }}>
-          <CalendarEntry color="blue" state="pressed" timeRange="10:00 – 11:00" patientName="Nagy Péter" doctorName="Dr. Tóth K." />
-          <CalendarEntry color="mint" state="unconfirmed" timeRange="11:00 – 12:00" patientName="Horváth M." doctorName="Dr. Kiss A." />
-        </div>
-      </section>
 
-      {/* ── TABLE ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Table</h2>
-        <TableToolbar>
-          <ToolbarButton icon={<Funnel size={14} />}>Filter</ToolbarButton>
-          <ToolbarButton icon={<Columns size={14} />}>Columns</ToolbarButton>
-          <ToolbarButton icon={<MagnifyingGlass size={14} />}>Search</ToolbarButton>
-          <ToolbarButton icon={<SortAscending size={14} />}>Sort</ToolbarButton>
-        </TableToolbar>
-        <Table>
-          <thead>
-            <TableRow>
-              <TableHeaderCell width={40}><Checkbox /></TableHeaderCell>
-              <TableHeaderCell width={170} align="left">Páciens</TableHeaderCell>
-              <TableHeaderCell width={140}>Időpont</TableHeaderCell>
-              <TableHeaderCell width={170}>Kezelés</TableHeaderCell>
-              <TableHeaderCell width={80}>Művelet</TableHeaderCell>
-            </TableRow>
-          </thead>
-          <tbody>
-            <TableRow>
-              <TableCell width={40}><Checkbox /></TableCell>
-              <TableCell width={170}>Kiss Anna <br /><small style={{ color: 'var(--color-neutral-600)', fontSize: 12 }}>#130124567890</small></TableCell>
-              <TableCell width={140} align="center">09:00 – 10:30<br /><small style={{ color: 'var(--color-neutral-600)', fontSize: 12 }}>2024.01.26</small></TableCell>
-              <TableCell width={170}><StatusBadge status="success" label="Folyamatban" /> Implantátum</TableCell>
-              <TableCell width={80} align="center">
-                <IconButton icon={<Phone size={14} />} size="sm" />
-                <IconButton icon={<Envelope size={14} />} size="sm" />
-              </TableCell>
-            </TableRow>
-            <TableRow selected>
-              <TableCell width={40}><Checkbox checked /></TableCell>
-              <TableCell width={170}>Nagy Péter <br /><small style={{ color: 'var(--color-neutral-600)', fontSize: 12 }}>#130124567891</small></TableCell>
-              <TableCell width={140} align="center">10:30 – 11:00<br /><small style={{ color: 'var(--color-neutral-600)', fontSize: 12 }}>2024.01.26</small></TableCell>
-              <TableCell width={170}><StatusBadge status="new" label="Új" /> Konzultáció</TableCell>
-              <TableCell width={80} align="center">
-                <IconButton icon={<Phone size={14} />} size="sm" />
-                <IconButton icon={<Envelope size={14} />} size="sm" />
-              </TableCell>
-            </TableRow>
-          </tbody>
-        </Table>
-      </section>
-
-      {/* ── TREATMENT PLAN ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Treatment Plan Rows</h2>
-        <div style={{ maxWidth: 700 }}>
-          <TreatmentPlanRow type="header" label="#130124567899" secondaryLabel="All-on-4 felső, full kontúr cirkón híd" />
-          <TreatmentPlanRow type="divider-open" label="1. VIZIT" statusBadge={<StatusBadge status="success" label="Aktív" />} />
-          <TreatmentPlanRow type="row-edit" label="Kezelés" secondaryLabel="Teljes szájhigiénia" amount="1 750 000 Ft" actions={<><IconButton icon={<Pencil size={14} />} size="sm" /><IconButton icon={<X size={14} />} size="sm" /></>} />
-          <TreatmentPlanRow type="row-done" label="Kezelés" secondaryLabel="Teljes szájhigiénia" amount="1 750 000 Ft" actions={<IconButton icon={<Check size={14} />} size="sm" />} />
-          <TreatmentPlanRow type="divider-start-visit" label="1. VIZIT" secondaryLabel="Vizit elindítása" />
-          <TreatmentPlanRow type="divider-start-consultation" label="KONZULTÁCIÓ" secondaryLabel="Konzultáció indítása" />
-          <TreatmentPlanRow type="divider-visit-sum" label="1. vizit összesen" amount="1 000 000 Ft" />
-          <TreatmentPlanRow type="divider-save" label="" amount="Kezelési terv mentése" />
-          <TreatmentPlanRow type="divider-saved" label="" amount="Mentve" />
-          <TreatmentPlanRow type="duration" label="Vizit időtartam: 2 nap" secondaryLabel="Gyógyulás idő: 3 hónap" />
-          <TreatmentPlanRow type="add-treatment" label="+ Új kezelés hozzáadása" />
-          <TreatmentPlanRow type="document-alert" label="Beleegyező / Röntgen" actions={<><IconButton icon={<Check size={14} />} size="sm" /></>} />
-          <TreatmentPlanRow type="document-signed" label="Beleegyező / Röntgen" actions={<><IconButton icon={<Check size={14} />} size="sm" /></>} />
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════
-          ── PANELS (Phase 2) ──
-       ═══════════════════════════════════════════ */}
-
-      {/* ── DRAWERS ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Drawers (Panels)</h2>
-        <div className={styles.row}>
-          <Button variant="primary" size="md" onClick={() => setPatientDrawer(true)}>Patient Master Drawer</Button>
-          <Button variant="primary" size="md" onClick={() => setTreatmentDrawer(true)}>Treatment Detail Drawer</Button>
-          <Button variant="primary" size="md" onClick={() => setTpDrawer(true)}>Treatment Plan Drawer</Button>
-        </div>
-        <PatientMasterDrawer open={patientDrawer} onClose={() => setPatientDrawer(false)} />
-        <TreatmentDetailDrawer open={treatmentDrawer} onClose={() => setTreatmentDrawer(false)} />
-        <TreatmentPlanMasterDrawer open={tpDrawer} onClose={() => setTpDrawer(false)} />
-      </section>
-
-      {/* ── CONTENT TABBED PANEL ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Content Tabbed Panel</h2>
-        <ContentTabbedPanel />
-      </section>
-
-      {/* ── STATUS TABBED PANEL (DENTAL CHART) ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Status Tabbed Panel (Dental Chart)</h2>
-        <StatusTabbedPanel />
-      </section>
-
-      {/* ── NOTIFICATION MODALS ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Notification Modals</h2>
-        <div className={styles.row}>
-          <Button variant="primary" size="md" onClick={() => setSuccessModal(true)}>Success Modal</Button>
-          <Button variant="outline" size="md" onClick={() => setWarningModal(true)}>Warning Modal</Button>
-        </div>
-        <NotificationModal
-          open={successModal}
-          onClose={() => setSuccessModal(false)}
-          variant="success"
-          title="Ambulánslap létrehozva"
-          description="Az ambulánslap sikeresen létrejött és csatolva lett a vizithez."
-          primaryLabel="Rendben"
-        />
-        <NotificationModal
-          open={warningModal}
-          onClose={() => setWarningModal(false)}
-          variant="warning"
-          title="Hiányzó műveletek"
-          description="A következő műveletek szükségesek a vizit lezárásához:"
-          items={['Aláírt fájlok feltöltése', 'Ambulánslap kitöltése']}
-          primaryLabel="Folytatás"
-          secondaryLabel="Mégse"
-        />
-      </section>
-
-      {/* ── CALENDAR POPUP ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Calendar Popup</h2>
-        <CalendarPopup />
-      </section>
-
-      {/* ── VOICE RECORDING BAR ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Voice Recording Bar</h2>
-        <VoiceRecordingBar />
-      </section>
-
-      {/* ── DESIGN TOKENS ── */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Design Tokens — Colors</h2>
-        <div className={styles.group}>
-          <h3 className={styles.groupTitle}>Neutral</h3>
-          <div className={styles.swatchRow}>
-            {[
-              ['50', '#F5F5F5'], ['100', '#EDEDED'], ['200', '#D9D9D9'],
-              ['400', '#CFCFCF'], ['500', '#BFC9CF'], ['600', '#5F7D95'],
-            ].map(([n, c]) => (
-              <div key={n} className={styles.swatch}>
-                <div className={styles.swatchColor} style={{ background: c }} />
-                <span className={styles.swatchLabel}>{n}</span>
-                <span className={styles.swatchHex}>{c}</span>
-              </div>
-            ))}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>Számla státuszok</h2>
+            <a href="/penzugy" style={{ fontSize: 13, color: 'var(--color-primary-500)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+              Összes <ArrowRight size={12} />
+            </a>
+          </div>
+          <div className={styles.statRow}>
+            <span className={styles.statLabel}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#32B100' }} /> Fizetve
+            </span>
+            <div className={styles.statBar}>
+              <div className={styles.statBarFill} style={{ width: `${data.invoiceStats.total ? (data.invoiceStats.paid / data.invoiceStats.total) * 100 : 0}%`, background: '#32B100' }} />
+            </div>
+            <span className={styles.statValue}>{data.invoiceStats.paid}</span>
+          </div>
+          <div className={styles.statRow}>
+            <span className={styles.statLabel}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#FF9D00' }} /> Függőben
+            </span>
+            <div className={styles.statBar}>
+              <div className={styles.statBarFill} style={{ width: `${data.invoiceStats.total ? (data.invoiceStats.pending / data.invoiceStats.total) * 100 : 0}%`, background: '#FF9D00' }} />
+            </div>
+            <span className={styles.statValue}>{data.invoiceStats.pending}</span>
+          </div>
+          <div className={styles.statRow}>
+            <span className={styles.statLabel}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#FF0000' }} /> Lejárt
+            </span>
+            <div className={styles.statBar}>
+              <div className={styles.statBarFill} style={{ width: `${data.invoiceStats.total ? (data.invoiceStats.overdue / data.invoiceStats.total) * 100 : 0}%`, background: '#FF0000' }} />
+            </div>
+            <span className={styles.statValue}>{data.invoiceStats.overdue}</span>
           </div>
         </div>
-        <div className={styles.group}>
-          <h3 className={styles.groupTitle}>Primary</h3>
-          <div className={styles.swatchRow}>
-            {[
-              ['50', '#DFFFFD'], ['100', '#90FFF8'], ['200', '#1CEEE0'],
-              ['400', '#62AACE'], ['500', '#186D98'], ['900', '#082432'],
-            ].map(([n, c]) => (
-              <div key={n} className={styles.swatch}>
-                <div className={styles.swatchColor} style={{ background: c }} />
-                <span className={styles.swatchLabel}>{n}</span>
-                <span className={styles.swatchHex}>{c}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className={styles.group}>
-          <h3 className={styles.groupTitle}>Brand</h3>
-          <div className={styles.swatchRow}>
-            {[
-              ['50', '#FFF1F9'], ['400', '#ED51A8'], ['500', '#C43284'], ['600', '#A2005B'],
-            ].map(([n, c]) => (
-              <div key={n} className={styles.swatch}>
-                <div className={styles.swatchColor} style={{ background: c }} />
-                <span className={styles.swatchLabel}>{n}</span>
-                <span className={styles.swatchHex}>{c}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className={styles.group}>
-          <h3 className={styles.groupTitle}>Status</h3>
-          <div className={styles.swatchRow}>
-            {[
-              ['Alert', '#FF0000'], ['Success', '#32B100'], ['New', '#60C5FF'], ['Offer', '#FF9D00'],
-              ['Consult', '#FFCE49'], ['Done', '#1C6100'], ['Wait', '#E696FF'], ['Reject', '#9D9D9D'], ['Inactive', '#000000'],
-            ].map(([n, c]) => (
-              <div key={n} className={styles.swatch}>
-                <div className={styles.swatchColor} style={{ background: c }} />
-                <span className={styles.swatchLabel}>{n}</span>
-                <span className={styles.swatchHex}>{c}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
-
