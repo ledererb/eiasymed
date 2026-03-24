@@ -1,71 +1,49 @@
-/* Patient detail page styles */
+/* Patient Detail — /paciensek/[id] */
 
-.loading, .notFound {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 80px 0;
-  color: var(--color-neutral-400);
-  font-size: 16px;
-}
-
-/* Header */
-.header {
+.pageHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.headerInfo {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  gap: 20px;
+  margin-bottom: 24px;
 }
 
 .avatar {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary-500), var(--color-brand-500));
+  background: linear-gradient(135deg, #186d98 0%, #082432 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-}
-
-.name {
-  font-size: 22px;
+  color: white;
   font-weight: 700;
-  color: var(--color-primary-900);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  font-size: 20px;
+  font-family: var(--font-family);
 }
 
-.vipBadge {
-  padding: 2px 8px;
-  background: #fef3c7;
-  color: #92400e;
-  border-radius: 4px;
-  font-size: 11px;
+.headerInfo {
+  flex: 1;
+}
+
+.patientName {
+  font-family: var(--font-family);
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  color: #082432;
+  line-height: 1.2;
 }
 
-.metaRow {
+.patientMeta {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-top: 6px;
+  margin-top: 4px;
+  font-family: var(--font-family);
   font-size: 13px;
-  color: var(--color-neutral-500);
+  color: #5f7d95;
 }
 
-.metaRow span {
+.patientMeta span {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -73,131 +51,126 @@
 
 .headerActions {
   display: flex;
-  align-items: center;
   gap: 10px;
 }
 
-/* Data grid */
-.dataGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+/* ── KPI Summary Row ── */
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.section {
-  background: var(--color-white);
-  border-radius: var(--radius-12);
-  border: 1px solid var(--color-neutral-100);
-  padding: 20px 24px;
+.kpiCard {
+  background: white;
+  border-radius: 14px;
+  padding: 18px 20px;
+  border: 1px solid #ededed;
 }
 
-.sectionTitle {
-  font-size: 14px;
+.kpiLabel {
+  font-family: var(--font-family);
+  font-size: 11px;
   font-weight: 600;
-  color: var(--color-primary-500);
+  color: #5f7d95;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin: 0 0 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
-.fieldGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 14px;
-}
-
-.fieldLabel {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-neutral-700);
-  display: block;
-  margin-bottom: 6px;
-}
-
-.notesField {
-  margin-top: 14px;
-}
-
-.textarea {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--color-neutral-200);
-  border-radius: var(--radius-8);
-  font-size: 14px;
+.kpiValue {
   font-family: var(--font-family);
-  color: var(--color-primary-900);
-  resize: vertical;
-  outline: none;
+  font-size: 22px;
+  font-weight: 700;
+  color: #082432;
+  margin-top: 6px;
 }
 
-.textarea:focus {
-  border-color: var(--color-primary-500);
+.kpiSub {
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #5f7d95;
+  margin-top: 2px;
 }
 
-.textarea:disabled {
-  background: var(--color-neutral-50);
-  color: var(--color-neutral-600);
-}
-
-/* Tables */
-.tableContainer {
-  background: var(--color-white);
-  border-radius: var(--radius-12);
-  border: 1px solid var(--color-neutral-100);
+/* ── Table ── */
+.tableWrap {
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #ededed;
   overflow: hidden;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-family: var(--font-family);
 }
 
-.table thead th {
-  text-align: left;
+.table th {
   padding: 12px 16px;
   font-size: 11px;
   font-weight: 600;
+  color: #5f7d95;
+  text-align: left;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--color-neutral-500);
-  background: var(--color-neutral-50);
-  border-bottom: 1px solid var(--color-neutral-100);
+  border-bottom: 1px solid #ededed;
+  background: #fafafa;
 }
 
-.table tbody td {
+.table td {
   padding: 14px 16px;
-  border-bottom: 1px solid var(--color-neutral-50);
-  color: var(--color-primary-900);
+  font-size: 13px;
+  color: #082432;
+  border-bottom: 1px solid #f5f5f5;
 }
 
-.tableRow {
-  transition: background 0.15s ease;
-  cursor: pointer;
+.table tr:last-child td {
+  border-bottom: none;
 }
-.tableRow:hover { background: var(--color-neutral-50); }
 
-.treatmentType { font-weight: 600; color: var(--color-brand-500); }
-.amountCell { font-weight: 700; }
-.emptyCell { text-align: center; padding: 40px 16px !important; color: var(--color-neutral-400); }
+.table tr:hover td {
+  background: #f9fbfc;
+}
 
-/* Placeholder tabs */
-.placeholderTab {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 60px 0;
-  color: var(--color-neutral-400);
-  font-size: 15px;
+/* ── Empty state ── */
+.emptyState {
+  padding: 40px;
   text-align: center;
+  color: #5f7d95;
+  font-family: var(--font-family);
+  font-size: 14px;
 }
 
-.placeholderHint {
+/* ── Loading ── */
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: #5f7d95;
+  font-family: var(--font-family);
+  font-size: 14px;
+}
+
+/* ── Status badge ── */
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
   font-size: 12px;
-  color: var(--color-neutral-300);
+  font-weight: 500;
+}
+
+.statusPaid { background: #dcfce7; color: #166534; }
+.statusUnpaid { background: #fef3c7; color: #92400e; }
+.statusOverdue { background: #fee2e2; color: #991b1b; }
+
+/* ── Treatment pill ── */
+.treatmentPill {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
 }

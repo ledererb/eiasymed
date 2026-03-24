@@ -359,7 +359,11 @@ export default function PaciensekPage() {
 
                   {/* Páciens */}
                   <div className={styles.patientCell}>
-                    <span className={styles.patientName}>
+                    <span
+                      className={styles.patientName}
+                      onClick={(e) => { e.stopPropagation(); router.push(`/paciensek/${a.patient_id}`); }}
+                      style={{ cursor: 'pointer' }}
+                    >
                       {a.patient_last_name} {a.patient_first_name}
                     </span>
                     <span className={styles.patientId}>

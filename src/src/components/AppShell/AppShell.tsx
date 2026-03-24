@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { TopNav } from '@/components/TopNav';
 import { SideNav } from '@/components/SideNav';
+import { SmartSearch } from '@/components/SmartSearch/SmartSearch';
 import { createClient } from '@/lib/supabase-browser';
 import {
   CalendarBlank,
@@ -85,6 +86,19 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const router = useRouter();
   const [activeSide, setActiveSide] = useState(getActiveFromPath(pathname));
   const [activeTop, setActiveTop] = useState(getActiveTopNavFromPath(pathname));
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // ⌘K / Ctrl+K to open smart search
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   // Sync nav state with route
   useEffect(() => {
@@ -141,6 +155,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
           {children}
         </main>
       </div>
+      <SmartSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 };
