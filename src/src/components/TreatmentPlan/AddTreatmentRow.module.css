@@ -2,8 +2,9 @@
   display: flex;
   align-items: center;
   padding: 0 30px;
-  height: 16px;
+  min-height: 16px;
   width: 100%;
+  position: relative;
 }
 .link {
   font-family: var(--font-family);
@@ -18,4 +19,91 @@
 }
 .link:hover {
   color: var(--color-primary-400);
+}
+
+/* Catalogue dropdown */
+.catalogue {
+  position: absolute;
+  top: 0;
+  left: 30px;
+  right: 30px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 50;
+  overflow: hidden;
+}
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border-secondary);
+  color: var(--color-text-secondary);
+}
+.searchInput {
+  flex: 1;
+  border: none;
+  background: none;
+  font-family: var(--font-family);
+  font-size: var(--font-size-13);
+  color: var(--color-text-primary);
+  outline: none;
+}
+.searchInput::placeholder {
+  color: var(--color-text-tertiary);
+}
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  padding: 2px 4px;
+}
+.catalogueList {
+  max-height: 280px;
+  overflow-y: auto;
+}
+.catalogueCategory {
+  font-family: var(--font-family);
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-tertiary);
+  padding: 8px 12px 4px;
+}
+.catalogueItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-family);
+  transition: background var(--transition-fast);
+}
+.catalogueItem:hover {
+  background: var(--color-bg-secondary);
+}
+.catalogueName {
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+.catalogueMeta {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+.catalogueLoading,
+.catalogueEmpty {
+  padding: 16px;
+  text-align: center;
+  font-size: var(--font-size-13);
+  color: var(--color-text-tertiary);
 }
