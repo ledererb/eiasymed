@@ -65,6 +65,10 @@ export default function KezelesPage() {
   const [rightTab, setRightTab] = useState('kezeles');
   const drawerOpen = step === 'visit_2_drawer';
 
+  // Editable treatment plan items
+  const [planItems, setPlanItems] = useState<{ id: string; name: string; area: string; price: number; qty: number; editing: boolean }[]>([]);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
+
   // Supabase data
   const [treatmentTypes, setTreatmentTypes] = useState<TreatmentType[]>([]);
   const supabase = createClient();
@@ -87,6 +91,17 @@ export default function KezelesPage() {
   const restorativeItems = treatmentTypes.filter(t => ['restorative', 'endodontic'].includes(t.category));
   const surgicalItems = treatmentTypes.filter(t => ['surgical', 'implant', 'prosthetic'].includes(t.category));
   const preventiveItems = treatmentTypes.filter(t => t.category === 'preventive');
+
+  // Initialize plan items from DB data on first render
+  useEffect(() => {
+    if (treatmentTypes.length > 0 && planItems.length === 0) {
+      const initial = diagnosticItems.slice(0, 3).map((t, i) => ({
+        id: `consult-${i}`, name: t.name, area: 'Teljes szájüreg',
+        price: t.base_price, qty: 1, editing: false,
+      }));
+      setPlanItems(initial);
+    }
+  }, [treatmentTypes]);
 
   const consultItems = diagnosticItems.slice(0, 3).map(t => ({
     name: t.name, area: 'Teljes szájüreg', price: formatPrice(t.base_price), qty: '× 1', total: formatPrice(t.base_price),
@@ -129,10 +144,49 @@ export default function KezelesPage() {
   const showVisit1Completed = step === 'visit_2' || step === 'visit_2_drawer';
   const showVisit2 = step === 'visit_1' || step === 'visit_2' || step === 'visit_2_drawer';
 
-  const editActions = (
+  const removePlanItem = (itemId: string) => {
+    setPlanItems(prev => prev.filter(p => p.id !== itemId));
+  };
+
+  const toggleEditItem = (itemId: string) => {
+    setPlanItems(prev => prev.map(p => p.id === itemId ? { ...p, editing: !p.editing } : p));
+  };
+
+  const updatePlanItem = (itemId: string, field: string, value: any) => {
+    setPlanItems(prev => prev.map(p => p.id === itemId ? { ...p, [field]: value } : p));
+  };
+
+  const addToPlan = (treatment: TreatmentType) => {
+    setPlanItems(prev => [...prev, {
+      id: `item-${Date.now()}`, name: treatment.name, area: 'Teljes szájüreg',
+      price: treatment.base_price, qty: 1, editing: false,
+    }]);
+  };
+
+  const saveTreatmentPlan = async () => {
+    const { data: plan } = await supabase.from('treatment_plans').insert({
+      title: 'All-on-4 felső, full kontúr cirkon híd',
+      status: 'accepted',
+      total_cost: planItems.reduce((s, i) => s + i.price * i.qty, 0),
+    }).select('id').single();
+    if (plan) {
+      const items = planItems.map(i => ({
+        treatment_plan_id: plan.id,
+        treatment_name: i.name,
+        tooth_area: i.area,
+        unit_price: i.price,
+        quantity: i.qty,
+      }));
+      await supabase.from('treatments').insert(items);
+    }
+    setSavedMessage('✅ Kezelési terv mentve!');
+    setTimeout(() => setSavedMessage(null), 3000);
+  };
+
+  const editActions = (itemId: string) => (
     <span style={{ display: 'flex', gap: 13, alignItems: 'center' }}>
-      <Pencil size={17} style={{ cursor: 'pointer', opacity: 0.6 }} />
-      <X size={18} style={{ cursor: 'pointer', opacity: 0.6 }} />
+      <Pencil size={17} style={{ cursor: 'pointer', opacity: 0.6 }} onClick={(e) => { e.stopPropagation(); toggleEditItem(itemId); }} />
+      <X size={18} style={{ cursor: 'pointer', opacity: 0.6 }} onClick={(e) => { e.stopPropagation(); removePlanItem(itemId); }} />
     </span>
   );
 
@@ -217,20 +271,35 @@ export default function KezelesPage() {
               status={showTPWriting ? 'signed' : 'alert'}
             />
 
-            {/* Consultation treatment rows — from Supabase */}
-            {consultItems.map((item, i) => (
-              <TreatmentPlanRow
-                key={`consult-${i}`}
-                type={showVisit1Completed ? 'row-done' : 'row-edit'}
-                label={item.name}
-                secondaryLabel={`${item.area}   ${item.price}   ${item.qty}`}
-                amount={item.total}
-                actions={showVisit1Completed ? doneCheck : editActions}
-              />
+            {planItems.map((item) => (
+              <React.Fragment key={item.id}>
+                <TreatmentPlanRow
+                  type={showVisit1Completed ? 'row-done' : 'row-edit'}
+                  label={item.name}
+                  secondaryLabel={`${item.area}   ${formatPrice(item.price)}   × ${item.qty}`}
+                  amount={formatPrice(item.price * item.qty)}
+                  actions={showVisit1Completed ? doneCheck : editActions(item.id)}
+                />
+                {item.editing && (
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', width: '100%', padding: '6px 16px', background: 'var(--color-neutral-50)', borderRadius: 8, marginTop: -4 }}>
+                    <input value={item.name} onChange={e => updatePlanItem(item.id, 'name', e.target.value)}
+                      style={{ flex: 2, padding: '4px 8px', border: '1px solid var(--color-neutral-200)', borderRadius: 6, fontSize: 13, fontFamily: 'var(--font-family)' }} />
+                    <input value={item.area} onChange={e => updatePlanItem(item.id, 'area', e.target.value)}
+                      style={{ flex: 1, padding: '4px 8px', border: '1px solid var(--color-neutral-200)', borderRadius: 6, fontSize: 13, fontFamily: 'var(--font-family)' }} />
+                    <input type="number" value={item.price} onChange={e => updatePlanItem(item.id, 'price', parseInt(e.target.value) || 0)}
+                      style={{ width: 80, padding: '4px 8px', border: '1px solid var(--color-neutral-200)', borderRadius: 6, fontSize: 13, fontFamily: 'var(--font-family)' }} />
+                    <span style={{ fontSize: 13, color: 'var(--color-neutral-500)' }}>×</span>
+                    <input type="number" value={item.qty} onChange={e => updatePlanItem(item.id, 'qty', parseInt(e.target.value) || 1)}
+                      style={{ width: 50, padding: '4px 8px', border: '1px solid var(--color-neutral-200)', borderRadius: 6, fontSize: 13, fontFamily: 'var(--font-family)' }} />
+                    <button onClick={() => toggleEditItem(item.id)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid var(--color-primary-200)', background: 'var(--color-primary-50)', fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-family)', color: 'var(--color-primary-500)', fontWeight: 600 }}>Kész</button>
+                  </div>
+                )}
+              </React.Fragment>
             ))}
 
-            <AddTreatmentRow />
-            <VisitSumRow label="KONZULTÁCIÓ ÖSSZESEN" amount={formatPrice(consultTotal)} />
+            <AddTreatmentRow onSelect={(t: any) => addToPlan(t)} />
+            <VisitSumRow label="KONZULTÁCIÓ ÖSSZESEN" amount={formatPrice(planItems.reduce((s, i) => s + i.price * i.qty, 0))} />
+            {savedMessage && <div style={{ padding: '8px 16px', background: '#dcfce7', color: '#166534', borderRadius: 8, fontSize: 13, fontWeight: 600, marginTop: 4 }}>{savedMessage}</div>}
 
             {!showTPWriting && (
               <VisitDivider visitNumber={1} actionLabel="Konzultáció lezárása" />
@@ -248,7 +317,6 @@ export default function KezelesPage() {
                   status={showVisit1Completed ? 'active' : 'upcoming'}
                 />
 
-                {/* Visit 1 items — from Supabase */}
                 {visit1Items.map((item, i) => (
                   <TreatmentPlanRow
                     key={`v1-${i}`}
@@ -256,7 +324,7 @@ export default function KezelesPage() {
                     label={item.name}
                     secondaryLabel={`${item.area}   ${item.price}   ${item.qty}`}
                     amount={item.total}
-                    actions={showVisit1Completed ? doneCheck : editActions}
+                    actions={showVisit1Completed ? doneCheck : editActions(`v1-${i}`)}
                   />
                 ))}
 
@@ -276,7 +344,6 @@ export default function KezelesPage() {
                       actionLabel={step === 'visit_2' ? 'Vizit indítása' : undefined}
                     />
 
-                    {/* Visit 2 items — from Supabase */}
                     {visit2Items.map((item, i) => (
                       <TreatmentPlanRow
                         key={`v2-${i}`}
@@ -284,7 +351,7 @@ export default function KezelesPage() {
                         label={item.name}
                         secondaryLabel={`${item.area}   ${item.price}   ${item.qty}`}
                         amount={item.total}
-                        actions={editActions}
+                        actions={editActions(`v2-${i}`)}
                       />
                     ))}
 

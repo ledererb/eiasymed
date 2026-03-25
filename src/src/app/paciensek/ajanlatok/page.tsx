@@ -73,6 +73,7 @@ export default function AjanlatokPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<PlanItem[]>([]);
   const [checkedRows, setCheckedRows] = useState<Set<string>>(new Set());
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const supabase = createClient();
 
   /* ── Fetch treatment plans ── */
@@ -138,14 +139,18 @@ export default function AjanlatokPage() {
 
   /* ── Filter ── */
   const filtered = useMemo(() => {
-    if (!searchQuery.trim()) return plans;
+    let result = plans;
+    if (statusFilter) {
+      result = result.filter(p => p.status === statusFilter);
+    }
+    if (!searchQuery.trim()) return result;
     const q = searchQuery.toLowerCase();
-    return plans.filter(p =>
+    return result.filter(p =>
       `${p.patient_last_name} ${p.patient_first_name}`.toLowerCase().includes(q) ||
       p.quote_number.toLowerCase().includes(q) ||
       p.title.toLowerCase().includes(q)
     );
-  }, [plans, searchQuery]);
+  }, [plans, searchQuery, statusFilter]);
 
   /* ── Selected plan for drawer ── */
   const selected = useMemo(() => {
@@ -180,9 +185,30 @@ export default function AjanlatokPage() {
 
       {/* ── Toolbar ── */}
       <div className={styles.toolbar}>
-        {/* Filter chips (static demo) */}
+        {/* Filter chips — functional status filter */}
         <div className={styles.filterChips}>
-          {/* Placeholder — these would be dynamic filter chips */}
+          {[
+            { id: null, label: 'Mind' },
+            { id: 'draft', label: 'Piszkozat' },
+            { id: 'sent', label: 'Elküldve' },
+            { id: 'accepted', label: 'Elfogadva' },
+            { id: 'rejected', label: 'Elutasítva' },
+          ].map(chip => (
+            <button
+              key={chip.id || 'all'}
+              onClick={() => setStatusFilter(chip.id)}
+              style={{
+                padding: '5px 14px', borderRadius: 16, fontSize: 12, fontWeight: 600,
+                border: '1px solid', cursor: 'pointer', fontFamily: 'var(--font-family)',
+                borderColor: statusFilter === chip.id ? 'var(--color-primary-500)' : 'var(--color-neutral-200)',
+                background: statusFilter === chip.id ? 'var(--color-primary-500)' : 'var(--color-neutral-50)',
+                color: statusFilter === chip.id ? 'white' : 'var(--color-primary-900)',
+                transition: 'all 0.15s',
+              }}
+            >
+              {chip.label}
+            </button>
+          ))}
         </div>
 
         <div className={styles.toolbarRight}>

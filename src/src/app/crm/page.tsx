@@ -68,6 +68,19 @@ export default function CrmPage() {
   const [leadForm, setLeadForm] = useState({ first_name: '', last_name: '', email: '', phone: '', source: 'website', estimated_value: '', pipeline_stage: 'new' });
   const [leadSaving, setLeadSaving] = useState(false);
 
+  // Kanban drag-and-drop
+  const [draggingLeadId, setDraggingLeadId] = useState<string | null>(null);
+  const [dragOverStage, setDragOverStage] = useState<string | null>(null);
+
+  // Automation rules
+  const [automationRules, setAutomationRules] = useState([
+    { id: 'auto_patient', label: 'Páciens automatikus létrehozása lead megnyerésekor', description: 'Ha egy lead "Megnyert" fázisba kerül, automatikusan páciens rekord jön létre.', enabled: true },
+    { id: 'auto_assign', label: 'Automatikus orvos hozzárendelés', description: 'Új leadek automatikusan a legkevesebb leadet kezelő orvoshoz kerülnek.', enabled: false },
+    { id: 'follow_up_3d', label: '3 napos follow-up emlékeztető', description: 'Ha a leaddel 3 napja nem volt kapcsolat, emlékeztető értesítés megy.', enabled: true },
+    { id: 'follow_up_7d', label: '7 napos inaktivitás figyelmeztetés', description: 'Ha 7 napig nem volt tevékenység, riportba kerül és email értesítés megy.', enabled: false },
+    { id: 'auto_score', label: 'Automatikus pontszámítás', description: 'Lead score automatikusan frissül az interakciók és válaszidők alapján.', enabled: true },
+  ]);
+
   const supabase = createClient();
 
   const fetchLeads = useCallback(async () => {
@@ -242,14 +255,28 @@ export default function CrmPage() {
         onSelect={setActiveTab}
       />
 
-      {/* Kanban Board view */}
+      {/* Kanban Board view — with drag and drop */}
       {activeTab === 'board' && (
         <div className={styles.kanbanBoard}>
           {PIPELINE_STAGES.filter(s => s.id !== 'lost').map(stage => {
             const stageLeads = leads.filter(l => l.pipeline_stage === stage.id);
             const stageValue = stageLeads.reduce((s, l) => s + (l.estimated_value || 0), 0);
             return (
-              <div key={stage.id} className={styles.kanbanColumn}>
+              <div
+                key={stage.id}
+                className={`${styles.kanbanColumn} ${dragOverStage === stage.id ? styles.kanbanColumnDragOver : ''}`}
+                onDragOver={(e) => { e.preventDefault(); setDragOverStage(stage.id); }}
+                onDragLeave={() => setDragOverStage(null)}
+                onDrop={async (e) => {
+                  e.preventDefault();
+                  setDragOverStage(null);
+                  if (draggingLeadId) {
+                    await supabase.from('leads').update({ pipeline_stage: stage.id }).eq('id', draggingLeadId);
+                    setDraggingLeadId(null);
+                    fetchLeads();
+                  }
+                }}
+              >
                 <div className={styles.kanbanColumnHeader}>
                   <div className={styles.kanbanColumnDot} style={{ background: stage.color }} />
                   <span className={styles.kanbanColumnTitle}>{stage.label}</span>
@@ -260,9 +287,12 @@ export default function CrmPage() {
                 </div>
                 <div className={styles.kanbanCards}>
                   {stageLeads.map(lead => (
-                    <button
+                    <div
                       key={lead.id}
-                      className={styles.kanbanCard}
+                      className={`${styles.kanbanCard} ${draggingLeadId === lead.id ? styles.kanbanCardDragging : ''}`}
+                      draggable
+                      onDragStart={() => setDraggingLeadId(lead.id)}
+                      onDragEnd={() => { setDraggingLeadId(null); setDragOverStage(null); }}
                       onClick={() => setSelectedLead(lead)}
                     >
                       <div className={styles.kanbanCardName}>
@@ -299,12 +329,81 @@ export default function CrmPage() {
                           <ArrowRight size={12} weight="bold" />
                         </button>
                       )}
-                    </button>
+                    </div>
                   ))}
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* ═══ AUTOMATIZÁCIÓ TAB ═══ */}
+      {activeTab === 'automation' && (
+        <div style={{ display: 'grid', gap: 12, maxWidth: 700 }}>
+          {automationRules.map(rule => (
+            <div key={rule.id} style={{
+              display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px',
+              background: 'var(--color-white)', border: '1px solid var(--color-neutral-100)',
+              borderRadius: 'var(--radius-12)', transition: 'border-color 0.15s',
+            }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-primary-900)', marginBottom: 4 }}>{rule.label}</div>
+                <div style={{ fontSize: 12, color: 'var(--color-neutral-500)', lineHeight: 1.4 }}>{rule.description}</div>
+              </div>
+              <label style={{ position: 'relative', display: 'inline-flex', width: 44, height: 24, cursor: 'pointer' }}>
+                <input type="checkbox" checked={rule.enabled} onChange={() => {
+                  setAutomationRules(prev => prev.map(r => r.id === rule.id ? { ...r, enabled: !r.enabled } : r));
+                }} style={{ opacity: 0, width: 0, height: 0 }} />
+                <span style={{
+                  position: 'absolute', inset: 0, borderRadius: 24,
+                  background: rule.enabled ? 'var(--color-primary-500)' : 'var(--color-neutral-200)',
+                  transition: 'background 0.2s',
+                }} />
+                <span style={{
+                  position: 'absolute', top: 2, left: rule.enabled ? 22 : 2,
+                  width: 20, height: 20, borderRadius: '50%',
+                  background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                  transition: 'left 0.2s',
+                }} />
+              </label>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ═══ SABLONOK TAB ═══ */}
+      {activeTab === 'templates' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          {[
+            { id: 'welcome', title: 'Üdvözlő email', type: 'Email', preview: 'Kedves {név}! Köszönjük, hogy érdeklődik klinikánk szolgáltatásai iránt...' },
+            { id: 'follow_up', title: 'Follow-up emlékeztető', type: 'Email', preview: 'Kedves {név}! Szeretnénk érdeklődni, hogy gondolkodott-e az ajánlatunkon...' },
+            { id: 'appointment', title: 'Időpont visszaigazolás', type: 'SMS', preview: 'Kedves {név}! Időpontja megerősítve: {dátum} {idő}. Klinika neve, címe.' },
+            { id: 'reminder_24h', title: '24 órás emlékeztető', type: 'SMS', preview: 'Kedves {név}! Holnap {idő}-kor időpontja van nálunk. Várjuk!' },
+            { id: 'quote', title: 'Árajánlat küldés', type: 'Email', preview: 'Kedves {név}! Mellékeljük a személyre szabott kezelési ajánlatunkat...' },
+            { id: 'post_treatment', title: 'Kezelés utáni utasítások', type: 'Email', preview: 'Kedves {név}! Az alábbiakban részletezzük a kezelés utáni teendőket...' },
+          ].map(tpl => (
+            <div key={tpl.id} style={{
+              background: 'var(--color-white)', border: '1px solid var(--color-neutral-100)',
+              borderRadius: 'var(--radius-12)', padding: 20, display: 'flex', flexDirection: 'column', gap: 10,
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-primary-900)' }}>{tpl.title}</span>
+                <span style={{ fontSize: 11, padding: '2px 10px', borderRadius: 12, fontWeight: 600,
+                  background: tpl.type === 'Email' ? '#dbeafe' : '#dcfce7',
+                  color: tpl.type === 'Email' ? '#1d4ed8' : '#166534' }}>
+                  {tpl.type}
+                </span>
+              </div>
+              <p style={{ fontSize: 13, color: 'var(--color-neutral-500)', lineHeight: 1.5, margin: 0 }}>{tpl.preview}</p>
+              <button style={{
+                alignSelf: 'flex-start', padding: '6px 14px', borderRadius: 8,
+                border: '1px solid var(--color-neutral-200)', background: 'var(--color-neutral-50)',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-family)',
+                color: 'var(--color-primary-900)',
+              }} onClick={() => alert(`Sablon szerkesztése: ${tpl.title}`)}>✏️ Szerkesztés</button>
+            </div>
+          ))}
         </div>
       )}
 
@@ -381,7 +480,7 @@ export default function CrmPage() {
                       }
                     </td>
                     <td>
-                      <button className={styles.actionBtn}><DotsThreeVertical size={16} /></button>
+                      <button className={styles.actionBtn} onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); }}><DotsThreeVertical size={16} /></button>
                     </td>
                   </tr>
                 );

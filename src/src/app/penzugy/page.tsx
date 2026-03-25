@@ -444,13 +444,63 @@ export default function PenzugyPage() {
         </div>
       )}
 
-      {/* Pénztárgép placeholder */}
-      {activeTab === 'cashregister' && (
-        <div className={styles.emptyState}>
-          <Receipt size={48} color="var(--color-neutral-300)" />
-          <p>Pénztárgép integráció hamarosan elérhető.</p>
-        </div>
-      )}
+      {/* Pénztárgép — Cash Register */}
+      {activeTab === 'cashregister' && (() => {
+        const todayStr = format(new Date(), 'yyyy-MM-dd');
+        const todayInvoices = invoices.filter(inv => inv.issued_at?.startsWith(todayStr));
+        const todayTotal = todayInvoices.reduce((sum, inv) => sum + (inv.gross_amount || 0), 0);
+        const todayPaid = todayInvoices.filter(inv => inv.payment_status === 'paid').reduce((sum, inv) => sum + (inv.gross_amount || 0), 0);
+        const todayPending = todayTotal - todayPaid;
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Register summary cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+              <div className={styles.card} style={{ padding: '20px 24px' }}>
+                <div style={{ fontSize: 11, textTransform: 'uppercase', color: 'var(--color-neutral-500)', fontWeight: 600, marginBottom: 8 }}>Mai bevétel</div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--color-primary-900)' }}>{new Intl.NumberFormat('hu-HU').format(todayTotal)} Ft</div>
+              </div>
+              <div className={styles.card} style={{ padding: '20px 24px' }}>
+                <div style={{ fontSize: 11, textTransform: 'uppercase', color: 'var(--color-neutral-500)', fontWeight: 600, marginBottom: 8 }}>Fizetve</div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: '#16a34a' }}>{new Intl.NumberFormat('hu-HU').format(todayPaid)} Ft</div>
+              </div>
+              <div className={styles.card} style={{ padding: '20px 24px' }}>
+                <div style={{ fontSize: 11, textTransform: 'uppercase', color: 'var(--color-neutral-500)', fontWeight: 600, marginBottom: 8 }}>Függőben</div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: '#d97706' }}>{new Intl.NumberFormat('hu-HU').format(todayPending)} Ft</div>
+              </div>
+            </div>
+
+            {/* Today's receipts */}
+            <div className={styles.card}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--color-neutral-100)' }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, margin: 0, color: 'var(--color-primary-900)' }}>Mai bizonylatok ({todayInvoices.length})</h3>
+                <span style={{ fontSize: 12, color: 'var(--color-neutral-500)' }}>{format(new Date(), 'yyyy. MMMM dd.', { locale: hu })}</span>
+              </div>
+              {todayInvoices.length === 0 ? (
+                <div style={{ padding: 40, textAlign: 'center', color: 'var(--color-neutral-400)', fontSize: 14 }}>
+                  <Receipt size={36} color="var(--color-neutral-200)" style={{ marginBottom: 8 }} />
+                  <p>Ma még nem készült számla.</p>
+                </div>
+              ) : (
+                <table className={styles.table}>
+                  <thead><tr><th>Számlaszám</th><th>Páciens</th><th>Időpont</th><th>Összeg</th><th>Fizetés</th><th>Státusz</th></tr></thead>
+                  <tbody>
+                    {todayInvoices.map(inv => (
+                      <tr key={inv.id} className={styles.tableRow}>
+                        <td className={styles.invoiceNum}>{inv.invoice_number}</td>
+                        <td>{inv.patient ? `${inv.patient.last_name} ${inv.patient.first_name}` : '—'}</td>
+                        <td style={{ fontSize: 12, color: 'var(--color-neutral-500)' }}>{format(new Date(inv.issued_at), 'HH:mm')}</td>
+                        <td style={{ fontWeight: 700 }}>{new Intl.NumberFormat('hu-HU').format(inv.gross_amount)} Ft</td>
+                        <td style={{ fontSize: 12 }}>{inv.payment_method || 'cash'}</td>
+                        <td><StatusBadge status={inv.payment_status === 'paid' ? 'success' : inv.payment_status === 'overdue' ? 'rejected' : 'waiting'} label={inv.payment_status === 'paid' ? 'Fizetve' : inv.payment_status === 'overdue' ? 'Lejárt' : 'Függőben'} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Price list tab */}
       {activeTab === 'pricelist' && (

@@ -482,7 +482,13 @@ export default function DentalTourismPage() {
             <div>
               <span style={{ fontSize: 11, textTransform: 'uppercase', color: 'var(--color-neutral-500)', fontWeight: 600, display: 'block', marginBottom: 6 }}>Belső megjegyzés</span>
               <textarea style={{ width: '100%', padding: '10px 14px', border: '1px solid var(--color-neutral-200)', borderRadius: 8, fontSize: 14, fontFamily: 'var(--font-family)', resize: 'vertical', outline: 'none' }}
-                value={reviewNotes} onChange={e => setReviewNotes(e.target.value)} placeholder="Belső megjegyzés..." rows={3} />
+                value={reviewNotes} onChange={e => setReviewNotes(e.target.value)}
+                onBlur={async () => {
+                  if (selectedConsultation && reviewNotes.trim()) {
+                    await supabase.from('online_consultations').update({ review_notes: reviewNotes }).eq('id', selectedConsultation.id);
+                  }
+                }}
+                placeholder="Belső megjegyzés..." rows={3} />
             </div>
           </div>
         )}
