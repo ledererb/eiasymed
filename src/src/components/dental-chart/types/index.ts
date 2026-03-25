@@ -15,24 +15,33 @@ export type SurfaceCondition =
   | 'filling_temp'
   | 'filling_defect'
   | 'inlay'
+  | 'onlay'
+  | 'sealant'
   | 'fracture'
   | 'abrasion'
-  | 'erosion';
+  | 'erosion'
+  | 'secondary_caries';
 
 // Whole-tooth conditions
 export type ToothCondition =
   | 'crown_metal'
   | 'crown_ceramic'
   | 'crown_pfm'
+  | 'crown_zirconia'
   | 'root_canal'
   | 'post_core'
   | 'bridge_abutment'
   | 'bridge_pontic'
   | 'veneer'
+  | 'stift'
+  | 'denture_clasp'
+  | 'orthodontic_bracket'
+  | 'periodontal_pocket'
   | 'mobility_1'
   | 'mobility_2'
   | 'mobility_3'
-  | 'periapical_lesion';
+  | 'periapical_lesion'
+  | 'recession';
 
 // Treatment types
 export type TreatmentType =
@@ -42,13 +51,20 @@ export type TreatmentType =
   | 'crown_ceramic'
   | 'crown_metal'
   | 'crown_pfm'
+  | 'crown_zirconia'
   | 'root_canal'
   | 'extraction'
   | 'implant'
   | 'bridge'
   | 'veneer'
   | 'sealant'
-  | 'scaling';
+  | 'scaling'
+  | 'periodontal_treatment'
+  | 'orthodontic'
+  | 'stift_placement'
+  | 'denture_partial'
+  | 'denture_full'
+  | 'fissure_seal';
 
 export type TreatmentStatus = 'planned' | 'in_progress' | 'completed' | 'cancelled';
 
