@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-browser';
 import styles from './page.module.css';
 
@@ -10,6 +11,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +31,8 @@ export default function LoginPage() {
       return;
     }
 
-    // Redirect to calendar on successful login
-    window.location.href = '/naptar';
+    // Redirect to dashboard on successful login
+    router.push('/');
   };
 
   return (
