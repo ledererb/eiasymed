@@ -433,7 +433,7 @@ export default function PenzugyPage() {
                     </td>
                     <td className={styles.amountCell}>{formatCurrency(p.amount)}</td>
                     <td style={{ fontSize: 12 }}>
-                      {{ cash: 'Készpénz', card: 'Bankkártya', transfer: 'Átutalás', health_fund: 'EP' }[p.payment_method] || p.payment_method}
+                      {{ cash: 'Készpénz', card: 'Bankkártya', transfer: 'Átutalás', health_fund: 'EP', szep_card: 'Szép kártya' }[p.payment_method] || p.payment_method}
                     </td>
                     <td className={styles.dateCell}>{format(new Date(p.created_at), 'yyyy. MM. dd. HH:mm', { locale: hu })}</td>
                   </tr>
@@ -558,7 +558,7 @@ export default function PenzugyPage() {
             <div>
               <label style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-neutral-700)', display: 'block', marginBottom: 6 }}>Fizetési mód</label>
               <Dropdown
-                items={[{ id: 'cash', label: 'Készpénz' }, { id: 'card', label: 'Bankkártya' }, { id: 'transfer', label: 'Átutalás' }, { id: 'health_fund', label: 'Egészségpénztár' }]}
+                items={[{ id: 'cash', label: 'Készpénz' }, { id: 'card', label: 'Bankkártya' }, { id: 'transfer', label: 'Átutalás' }, { id: 'health_fund', label: 'Egészségpénztár' }, { id: 'szep_card', label: 'Szép kártya' }]}
                 value={payMethod}
                 onChange={v => setPayMethod(v as string)}
               />
