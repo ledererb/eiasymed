@@ -63,6 +63,11 @@ export default function BeallitasokPage() {
   const [navSaving, setNavSaving] = useState(false);
   const [navTestResult, setNavTestResult] = useState<string | null>(null);
 
+  // Permissions
+  const [permissions, setPermissions] = useState<{ id: string; role: string; resource: string; can_create: boolean; can_read: boolean; can_update: boolean; can_delete: boolean }[]>([]);
+  // Audit log
+  const [auditLogs, setAuditLogs] = useState<{ id: string; table_name: string; record_id: string | null; action: string; performed_at: string; new_values: any }[]>([]);
+
   // EESZT config
   const [eesztForm, setEesztForm] = useState({ provider_id: '', facility_id: '', api_key_encrypted: '', is_production: false });
   const [eesztSaving, setEesztSaving] = useState(false);
@@ -90,6 +95,12 @@ export default function BeallitasokPage() {
     // Load EESZT config
     const { data: eesztData } = await supabase.from('eeszt_config').select('*').single();
     if (eesztData) setEesztForm(f => ({ ...f, ...eesztData }));
+    // Load permissions
+    const { data: permsData } = await supabase.from('role_permissions').select('*').order('role').order('resource');
+    setPermissions(permsData || []);
+    // Load audit log (last 50)
+    const { data: auditData } = await supabase.from('audit_log').select('*').order('performed_at', { ascending: false }).limit(50);
+    setAuditLogs(auditData || []);
     setLoading(false);
   }, [selectedStaffId]);
 
@@ -190,7 +201,9 @@ export default function BeallitasokPage() {
           { id: 'staff', label: 'Személyzet' },
           { id: 'locations', label: 'Helyszínek' },
           { id: 'hours', label: 'Munkaidő' },
+          { id: 'permissions', label: 'Jogosultságok' },
           { id: 'nav_eeszt', label: 'NAV & EESZT' },
+          { id: 'audit', label: 'Audit napló' },
         ]}
         activeId={activeTab}
         onSelect={setActiveTab}
@@ -284,6 +297,85 @@ export default function BeallitasokPage() {
           </div>
         </div>
       )}
+
+      {/* ═══ PERMISSIONS TAB ═══ */}
+      {activeTab === 'permissions' && (
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <Shield size={20} weight="bold" />
+            <h3 className={styles.cardTitle}>Jogosultság kezelés (RBAC)</h3>
+          </div>
+          <table className={styles.card} style={{ width: '100%', borderCollapse: 'collapse', marginTop: 12, fontSize: 13 }}>
+            <thead>
+              <tr style={{ background: 'var(--color-neutral-50)' }}>
+                <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--color-neutral-500)' }}>Szerepkör</th>
+                <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--color-neutral-500)' }}>Erőforrás</th>
+                <th style={{ padding: '10px 14px', textAlign: 'center', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--color-neutral-500)' }}>Olvasás</th>
+                <th style={{ padding: '10px 14px', textAlign: 'center', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--color-neutral-500)' }}>Létrehozás</th>
+                <th style={{ padding: '10px 14px', textAlign: 'center', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--color-neutral-500)' }}>Módosítás</th>
+                <th style={{ padding: '10px 14px', textAlign: 'center', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--color-neutral-500)' }}>Törlés</th>
+              </tr>
+            </thead>
+            <tbody>
+              {permissions.map(p => (
+                <tr key={p.id} style={{ borderBottom: '1px solid var(--color-neutral-50)' }}>
+                  <td style={{ padding: '8px 14px', fontWeight: 600 }}>{ROLES[p.role] || p.role}</td>
+                  <td style={{ padding: '8px 14px', color: 'var(--color-neutral-600)' }}>{p.resource}</td>
+                  {(['can_read', 'can_create', 'can_update', 'can_delete'] as const).map(field => (
+                    <td key={field} style={{ padding: '8px 14px', textAlign: 'center' }}>
+                      <input type="checkbox" checked={p[field]} onChange={async () => {
+                        await supabase.from('role_permissions').update({ [field]: !p[field] }).eq('id', p.id);
+                        setPermissions(prev => prev.map(pp => pp.id === p.id ? { ...pp, [field]: !pp[field] } : pp));
+                      }} />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ═══ AUDIT LOG TAB ═══ */}
+      {activeTab === 'audit' && (
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <Shield size={20} weight="bold" />
+            <h3 className={styles.cardTitle}>Audit napló</h3>
+          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 12, fontSize: 13 }}>
+            <thead>
+              <tr style={{ background: 'var(--color-neutral-50)' }}>
+                <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--color-neutral-500)' }}>Időpont</th>
+                <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--color-neutral-500)' }}>Tábla</th>
+                <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--color-neutral-500)' }}>Művelet</th>
+                <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--color-neutral-500)' }}>Részletek</th>
+              </tr>
+            </thead>
+            <tbody>
+              {auditLogs.length === 0 ? (
+                <tr><td colSpan={4} style={{ padding: 40, textAlign: 'center', color: 'var(--color-neutral-400)' }}>Még nincsenek naplóbejegyzések.</td></tr>
+              ) : auditLogs.map(log => (
+                <tr key={log.id} style={{ borderBottom: '1px solid var(--color-neutral-50)' }}>
+                  <td style={{ padding: '8px 14px', fontSize: 12, color: 'var(--color-neutral-500)' }}>{new Date(log.performed_at).toLocaleString('hu-HU')}</td>
+                  <td style={{ padding: '8px 14px', fontWeight: 600 }}>{log.table_name}</td>
+                  <td style={{ padding: '8px 14px' }}>
+                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, fontWeight: 600,
+                      background: log.action.includes('INSERT') ? '#dcfce7' : log.action.includes('DELETE') ? '#fee2e2' : '#dbeafe',
+                      color: log.action.includes('INSERT') ? '#166534' : log.action.includes('DELETE') ? '#991b1b' : '#1d4ed8' }}>
+                      {log.action}
+                    </span>
+                  </td>
+                  <td style={{ padding: '8px 14px', fontSize: 12, color: 'var(--color-neutral-600)', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {log.new_values ? JSON.stringify(log.new_values).substring(0, 80) : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
 
       {/* ═══ STAFF DRAWER ═══ */}
       <Drawer open={staffDrawerOpen} onClose={() => setStaffDrawerOpen(false)} title={editingStaff ? 'Munkatárs szerkesztése' : 'Új munkatárs'} width="wide">
