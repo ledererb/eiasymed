@@ -233,6 +233,7 @@ export default function CrmPage() {
       <Tabs
         items={[
           { id: 'pipeline', label: 'Pipeline' },
+          { id: 'board', label: 'Board' },
           { id: 'activities', label: 'Tevékenységek' },
           { id: 'automation', label: 'Automatizáció' },
           { id: 'templates', label: 'Sablonok' },
@@ -241,7 +242,74 @@ export default function CrmPage() {
         onSelect={setActiveTab}
       />
 
+      {/* Kanban Board view */}
+      {activeTab === 'board' && (
+        <div className={styles.kanbanBoard}>
+          {PIPELINE_STAGES.filter(s => s.id !== 'lost').map(stage => {
+            const stageLeads = leads.filter(l => l.pipeline_stage === stage.id);
+            const stageValue = stageLeads.reduce((s, l) => s + (l.estimated_value || 0), 0);
+            return (
+              <div key={stage.id} className={styles.kanbanColumn}>
+                <div className={styles.kanbanColumnHeader}>
+                  <div className={styles.kanbanColumnDot} style={{ background: stage.color }} />
+                  <span className={styles.kanbanColumnTitle}>{stage.label}</span>
+                  <span className={styles.kanbanColumnCount}>{stageLeads.length}</span>
+                </div>
+                <div className={styles.kanbanColumnValue}>
+                  {new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'HUF', maximumFractionDigits: 0 }).format(stageValue)}
+                </div>
+                <div className={styles.kanbanCards}>
+                  {stageLeads.map(lead => (
+                    <button
+                      key={lead.id}
+                      className={styles.kanbanCard}
+                      onClick={() => setSelectedLead(lead)}
+                    >
+                      <div className={styles.kanbanCardName}>
+                        <UserCircle size={22} color="var(--color-neutral-300)" weight="fill" />
+                        {lead.last_name} {lead.first_name}
+                      </div>
+                      {lead.estimated_value > 0 && (
+                        <div className={styles.kanbanCardValue}>
+                          {new Intl.NumberFormat('hu-HU', { maximumFractionDigits: 0 }).format(lead.estimated_value)} Ft
+                        </div>
+                      )}
+                      <div className={styles.kanbanCardMeta}>
+                        {lead.source && <span>{lead.source}</span>}
+                        {lead.score > 0 && <span><Star size={11} weight="fill" /> {lead.score}</span>}
+                        {lead.last_contacted_at && (
+                          <span>{formatDistanceToNow(new Date(lead.last_contacted_at), { addSuffix: true, locale: hu })}</span>
+                        )}
+                      </div>
+                      {/* Quick stage advance */}
+                      {stage.id !== 'won' && (
+                        <button
+                          className={styles.kanbanAdvanceBtn}
+                          title="Következő fázis"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            const stages = PIPELINE_STAGES.map(s => s.id);
+                            const nextIdx = stages.indexOf(stage.id) + 1;
+                            if (nextIdx < stages.length) {
+                              await supabase.from('leads').update({ pipeline_stage: stages[nextIdx] }).eq('id', lead.id);
+                              fetchLeads();
+                            }
+                          }}
+                        >
+                          <ArrowRight size={12} weight="bold" />
+                        </button>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {/* Search */}
+      {(activeTab === 'pipeline' || activeTab === 'activities') && (
       <div className={styles.searchBar}>
         <MagnifyingGlass size={18} color="var(--color-neutral-400)" />
         <input
@@ -251,8 +319,9 @@ export default function CrmPage() {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
+      )}
 
-      {/* Lead table */}
+      {activeTab === 'pipeline' && (
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
@@ -321,6 +390,7 @@ export default function CrmPage() {
           </tbody>
         </table>
       </div>
+      )}
 
       {/* Lead detail drawer */}
       <Drawer

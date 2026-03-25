@@ -267,3 +267,124 @@
 .timelineType { font-size: 12px; font-weight: 600; color: var(--color-primary-500); display: flex; align-items: center; gap: 4px; }
 .timelineDesc { font-size: 13px; color: var(--color-primary-900); }
 .timelineDate { font-size: 11px; color: var(--color-neutral-400); }
+
+/* Kanban Board */
+.kanbanBoard {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  min-height: 400px;
+}
+.kanbanColumn {
+  background: var(--color-neutral-50);
+  border-radius: var(--radius-12);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.kanbanColumnHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.kanbanColumnDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.kanbanColumnTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary-900);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.kanbanColumnCount {
+  font-size: 11px;
+  color: var(--color-neutral-500);
+  background: var(--color-neutral-200);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-weight: 600;
+}
+.kanbanColumnValue {
+  font-size: 11px;
+  color: var(--color-neutral-500);
+  font-weight: 500;
+}
+.kanbanCards {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.kanbanCard {
+  background: var(--color-white);
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-8);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--font-family);
+  text-align: left;
+  position: relative;
+  width: 100%;
+}
+.kanbanCard:hover {
+  border-color: var(--color-primary-200);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.kanbanCardName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary-900);
+  margin-bottom: 4px;
+}
+.kanbanCardValue {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-brand-500);
+  margin-bottom: 4px;
+}
+.kanbanCardMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--color-neutral-400);
+}
+.kanbanCardMeta span {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.kanbanAdvanceBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-primary-200);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-primary-500);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.kanbanCard:hover .kanbanAdvanceBtn {
+  opacity: 1;
+}
+.kanbanAdvanceBtn:hover {
+  background: var(--color-primary-500);
+  color: white;
+}
+
