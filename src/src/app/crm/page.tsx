@@ -12,6 +12,8 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/Button';
 import { Tabs } from '@/components/Tabs';
 import { Drawer } from '@/components/Drawer';
+import { InputField } from '@/components/InputField';
+import { Dropdown } from '@/components/Dropdown';
 import { createClient } from '@/lib/supabase-browser';
 import { format, formatDistanceToNow } from 'date-fns';
 import { hu } from 'date-fns/locale';
@@ -59,6 +61,12 @@ export default function CrmPage() {
   const [stageFilter, setStageFilter] = useState<string | null>(null);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [activities, setActivities] = useState<{ id: string; activity_type: string; description: string; created_at: string }[]>([]);
+
+  // Lead creation/edit drawer
+  const [leadDrawerOpen, setLeadDrawerOpen] = useState(false);
+  const [editingLead, setEditingLead] = useState<Lead | null>(null);
+  const [leadForm, setLeadForm] = useState({ first_name: '', last_name: '', email: '', phone: '', source: 'website', estimated_value: '', pipeline_stage: 'new' });
+  const [leadSaving, setLeadSaving] = useState(false);
 
   const supabase = createClient();
 
@@ -154,6 +162,41 @@ export default function CrmPage() {
     return new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'HUF', maximumFractionDigits: 0 }).format(amount);
   };
 
+  // Open lead drawer for create/edit
+  const openLeadDrawer = (lead?: Lead) => {
+    if (lead) {
+      setEditingLead(lead);
+      setLeadForm({ first_name: lead.first_name, last_name: lead.last_name, email: lead.email || '', phone: lead.phone || '', source: lead.source, estimated_value: String(lead.estimated_value || ''), pipeline_stage: lead.pipeline_stage });
+    } else {
+      setEditingLead(null);
+      setLeadForm({ first_name: '', last_name: '', email: '', phone: '', source: 'website', estimated_value: '', pipeline_stage: 'new' });
+    }
+    setLeadDrawerOpen(true);
+  };
+
+  // Save lead
+  const saveLead = async () => {
+    setLeadSaving(true);
+    const payload = { first_name: leadForm.first_name, last_name: leadForm.last_name, email: leadForm.email || null, phone: leadForm.phone || null, source: leadForm.source, estimated_value: parseFloat(leadForm.estimated_value) || 0, pipeline_stage: leadForm.pipeline_stage, status: 'active', score: 0 };
+    if (editingLead) {
+      await supabase.from('leads').update(payload).eq('id', editingLead.id);
+      if (selectedLead?.id === editingLead.id) setSelectedLead({ ...selectedLead, ...payload } as Lead);
+    } else {
+      await supabase.from('leads').insert(payload);
+    }
+    setLeadSaving(false);
+    setLeadDrawerOpen(false);
+    fetchLeads();
+  };
+
+  // Delete lead
+  const deleteLead = async (id: string) => {
+    await supabase.from('lead_activities').delete().eq('lead_id', id);
+    await supabase.from('leads').delete().eq('id', id);
+    setSelectedLead(null);
+    fetchLeads();
+  };
+
   return (
     <AppShell>
       <Breadcrumbs items={[{ label: 'CRM' }]} />
@@ -164,7 +207,7 @@ export default function CrmPage() {
           <h1 className={styles.pageTitle}>CRM — Lead Kezelés</h1>
           <p className={styles.pageSubtitle}>{leads.length} lead a rendszerben</p>
         </div>
-        <Button variant="primary" onClick={() => {}}>
+        <Button variant="primary" onClick={() => openLeadDrawer()}>
           <Plus size={16} weight="bold" /> Új lead
         </Button>
       </div>
@@ -350,6 +393,20 @@ export default function CrmPage() {
                   <Notebook size={16} /> Jegyzet
                 </button>
               </div>
+              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                <button
+                  style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #e0e0e0', background: '#f5f7fa', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-family)', color: '#082432' }}
+                  onClick={() => { openLeadDrawer(selectedLead); setSelectedLead(null); }}
+                >
+                  ✏️ Szerkesztés
+                </button>
+                <button
+                  style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #fee2e2', background: '#fee2e2', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-family)', color: '#991b1b' }}
+                  onClick={() => { if (confirm('Biztosan törli ezt a leadet?')) deleteLead(selectedLead.id); }}
+                >
+                  🗑️ Törlés
+                </button>
+              </div>
             </div>
 
             {/* Activity timeline */}
@@ -379,6 +436,33 @@ export default function CrmPage() {
             </div>
           </div>
         )}
+      </Drawer>
+
+      {/* ═══ LEAD CREATE/EDIT DRAWER ═══ */}
+      <Drawer open={leadDrawerOpen} onClose={() => setLeadDrawerOpen(false)} title={editingLead ? 'Lead szerkesztése' : 'Új lead'} width="wide">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <InputField label="Vezetéknév" value={leadForm.last_name} onChange={e => setLeadForm(p => ({ ...p, last_name: e.target.value }))} />
+            <InputField label="Keresztnév" value={leadForm.first_name} onChange={e => setLeadForm(p => ({ ...p, first_name: e.target.value }))} />
+          </div>
+          <InputField label="Email" type="email" value={leadForm.email} onChange={e => setLeadForm(p => ({ ...p, email: e.target.value }))} />
+          <InputField label="Telefon" value={leadForm.phone} onChange={e => setLeadForm(p => ({ ...p, phone: e.target.value }))} />
+          <Dropdown value={leadForm.source} onChange={v => setLeadForm(p => ({ ...p, source: typeof v === 'string' ? v : v[0] }))}
+            items={[
+              { id: 'website', label: 'Weboldal' },
+              { id: 'referral', label: 'Ajánlás' },
+              { id: 'social', label: 'Közösségi média' },
+              { id: 'ad', label: 'Hirdetés' },
+              { id: 'walk_in', label: 'Beszélő' },
+              { id: 'other', label: 'Egyéb' },
+            ]} />
+          <InputField label="Becsült érték (Ft)" type="number" value={leadForm.estimated_value} onChange={e => setLeadForm(p => ({ ...p, estimated_value: e.target.value }))} />
+          <Dropdown value={leadForm.pipeline_stage} onChange={v => setLeadForm(p => ({ ...p, pipeline_stage: typeof v === 'string' ? v : v[0] }))}
+            items={PIPELINE_STAGES.map(s => ({ id: s.id, label: s.label }))} />
+          <Button variant="primary" onClick={saveLead}>
+            {leadSaving ? 'Mentés...' : editingLead ? 'Mentés' : 'Lead létrehozása'}
+          </Button>
+        </div>
       </Drawer>
     </AppShell>
   );

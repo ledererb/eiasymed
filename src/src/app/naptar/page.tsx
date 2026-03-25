@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Funnel, MagnifyingGlass, CaretCircleLeft, CaretCircleRight, PlusCircle,
   Users, House, Flag, CaretLeft, CaretRight, Clock, X,
@@ -152,6 +153,7 @@ export default function NaptarPage() {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 })
@@ -163,6 +165,13 @@ export default function NaptarPage() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [doctors, setDoctors] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Search + filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [doctorFilter, setDoctorFilter] = useState<Set<string>>(new Set());
+  const [typeFilter, setTypeFilter] = useState<Set<string>>(new Set());
+
+  const router = useRouter();
 
   // Drag-and-drop state
   const [draggingEventId, setDraggingEventId] = useState<string | null>(null);
@@ -442,7 +451,11 @@ export default function NaptarPage() {
 
           <div className={styles.searchBox}>
             <MagnifyingGlass size={18} color="var(--color-neutral-600)" />
-            <input placeholder="Keresés a naptárban" />
+            <input
+              placeholder="Keresés a naptárban"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
           </div>
 
           <div className={styles.dateNav}>
@@ -517,9 +530,13 @@ export default function NaptarPage() {
         <div className={styles.calendarArea}>
           {/* Filter sidebar */}
           <div className={`${styles.filterSidebar} ${!filterOpen ? styles.filterSidebarHidden : ''}`}>
-            <CheckGroup icon={<Users size={14} />} label="ORVOSOK" items={doctors.map(d => d.name)} />
+            <CheckGroup icon={<Users size={14} />} label="ORVOSOK" items={doctors.map(d => d.name)} onToggle={(name, checked) => {
+              setDoctorFilter(prev => { const next = new Set(prev); if (checked) next.delete(name); else next.add(name); return next; });
+            }} />
             <CheckGroup icon={<House size={14} />} label="RENDELŐK" items={['1-es szék', '2-es szék', '3-as szék']} />
-            <CheckGroup icon={<Flag size={14} />} label="TÍPUS" items={['Konzultáció', 'Kezelés', 'Kontroll', 'Sürgős', 'Higiénia', 'Sebészet']} />
+            <CheckGroup icon={<Flag size={14} />} label="TÍPUS" items={['consultation', 'treatment', 'followup', 'emergency', 'hygiene', 'surgery']} onToggle={(name, checked) => {
+              setTypeFilter(prev => { const next = new Set(prev); if (checked) next.delete(name); else next.add(name); return next; });
+            }} />
           </div>
 
           {/* Calendar grid */}
@@ -553,7 +570,20 @@ export default function NaptarPage() {
                   <div className={styles.loadingOverlay}>Betöltés...</div>
                 )}
                 {days.map((_, dayIdx) => {
-                  const dayEvents = events.filter(e => e.day === dayIdx);
+                  let dayEvents = events.filter(e => e.day === dayIdx);
+                  // Apply search filter
+                  if (searchQuery.trim()) {
+                    const q = searchQuery.toLowerCase();
+                    dayEvents = dayEvents.filter(e => e.patient.toLowerCase().includes(q) || e.doctor.toLowerCase().includes(q));
+                  }
+                  // Apply doctor filter
+                  if (doctorFilter.size > 0) {
+                    dayEvents = dayEvents.filter(e => doctorFilter.has(e.doctor));
+                  }
+                  // Apply type filter
+                  if (typeFilter.size > 0) {
+                    dayEvents = dayEvents.filter(e => e.category && typeFilter.has(e.category));
+                  }
                   const layouted = layoutEvents(dayEvents);
                   return (
                     <div
@@ -616,8 +646,10 @@ export default function NaptarPage() {
 
               <div className={styles.drawerPatient}>
                 <h2 className={styles.drawerPatientName}>
-                  {selectedEvent.patient}
-                  <ArrowSquareOut size={18} className={styles.drawerLink} />
+                  <span style={{ cursor: 'pointer' }} onClick={() => selectedEvent?.patientId && router.push(`/paciensek/${selectedEvent.patientId}`)}>
+                    {selectedEvent.patient}
+                    <ArrowSquareOut size={18} className={styles.drawerLink} />
+                  </span>
                 </h2>
                 <p className={styles.drawerPatientId}>ID: {selectedEvent.patientId?.slice(0, 8)}</p>
                 {selectedEvent.phone && (
@@ -676,7 +708,9 @@ export default function NaptarPage() {
                         {days[selectedEvent.day]?.date} ({days[selectedEvent.day]?.name?.charAt(0)}),{' '}
                         {selectedEvent.startHour}:{String(selectedEvent.startMin).padStart(2, '0')}
                       </span>
-                      <PencilSimple size={14} className={styles.drawerLink} />
+                      <PencilSimple size={14} className={styles.drawerLink} style={{ cursor: 'pointer' }} onClick={() => {
+                        setEditDrawerOpen(true);
+                      }} />
                     </div>
                     <p className={styles.drawerVisitType}>{selectedEvent.category || 'Konzultáció'}</p>
                     <p className={styles.drawerVisitDoctor}>{selectedEvent.doctor}</p>
@@ -711,6 +745,33 @@ export default function NaptarPage() {
             saving={saving}
           />
         </Drawer>
+
+        {/* Edit appointment drawer */}
+        <Drawer
+          open={editDrawerOpen}
+          onClose={() => setEditDrawerOpen(false)}
+          title="Időpont szerkesztése"
+          width="wide"
+        >
+          {selectedEvent && (
+            <AppointmentForm
+              initialData={{
+                id: selectedEvent.appointmentId,
+                date: format(addDays(currentWeekStart, selectedEvent.day), 'yyyy-MM-dd'),
+                start_time: `${String(selectedEvent.startHour).padStart(2, '0')}:${String(selectedEvent.startMin).padStart(2, '0')}`,
+                end_time: `${String(selectedEvent.endHour).padStart(2, '0')}:${String(selectedEvent.endMin).padStart(2, '0')}`,
+                appointment_type: selectedEvent.category || 'consultation',
+                treatment_notes: selectedEvent.notes || '',
+              }}
+              onSave={async (data, id) => {
+                await handleSaveAppointment(data, id);
+                setEditDrawerOpen(false);
+              }}
+              onCancel={() => setEditDrawerOpen(false)}
+              saving={saving}
+            />
+          )}
+        </Drawer>
       </div>
     </AppShell>
   );
@@ -722,7 +783,7 @@ function durationToText(e: CalendarEvent): string {
 }
 
 /* ─── CheckGroup helper ─── */
-function CheckGroup({ icon, label, items }: { icon: React.ReactNode; label: string; items: string[] }) {
+function CheckGroup({ icon, label, items, onToggle }: { icon: React.ReactNode; label: string; items: string[]; onToggle?: (name: string, checked: boolean) => void }) {
   return (
     <div className={styles.filterGroup}>
       <div className={styles.filterGroupLabel}>
@@ -730,7 +791,7 @@ function CheckGroup({ icon, label, items }: { icon: React.ReactNode; label: stri
       </div>
       {items.map(name => (
         <label key={name} className={styles.filterItem}>
-          <input type="checkbox" defaultChecked />
+          <input type="checkbox" defaultChecked onChange={e => onToggle?.(name, e.target.checked)} />
           {name}
         </label>
       ))}

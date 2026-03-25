@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Calendar, Users, CurrencyDollar, UserPlus,
   CalendarPlus, ClipboardText, TrendUp,
@@ -69,6 +70,7 @@ function timeAgo(iso: string): string {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -267,9 +269,9 @@ export default function DashboardPage() {
           <p>{new Date().toLocaleDateString('hu-HU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
         <div className={styles.quickActions}>
-          <Button variant="primary" size="md" icon={<CalendarPlus size={16} />} onClick={() => window.location.href = '/naptar'}>Új időpont</Button>
-          <Button variant="outline" size="md" icon={<UserPlus size={16} />} onClick={() => window.location.href = '/paciensek'}>Új páciens</Button>
-          <Button variant="outline" size="md" icon={<ClipboardText size={16} />} onClick={() => window.location.href = '/paciensek/ajanlatok'}>Ajánlatok</Button>
+          <Button variant="primary" size="md" icon={<CalendarPlus size={16} />} onClick={() => router.push('/naptar')}>Új időpont</Button>
+          <Button variant="outline" size="md" icon={<UserPlus size={16} />} onClick={() => router.push('/paciensek')}>Új páciens</Button>
+          <Button variant="outline" size="md" icon={<ClipboardText size={16} />} onClick={() => router.push('/paciensek/ajanlatok')}>Ajánlatok</Button>
         </div>
       </div>
 

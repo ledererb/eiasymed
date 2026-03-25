@@ -315,7 +315,7 @@ export default function KezelesPage() {
       </div>
 
       {/* Drawer — only visible in the '2. vizit + Drawer' state */}
-      <TreatmentDetailDrawer open={drawerOpen} onClose={() => {}} />
+      <TreatmentDetailDrawer open={drawerOpen} onClose={() => setStep('visit_2')} />
     </AppShell>
   );
 }

@@ -357,11 +357,12 @@ export default function PenzugyPage() {
                                 body: JSON.stringify({ invoice_id: inv.id }),
                               });
                               const result = await resp.json();
-                              alert(result.message || 'NAV beküldés kész');
+                              const btn = document.getElementById(`nav-btn-${inv.id}`);
+                              if (btn) { btn.textContent = result.message ? '✅' : '⚠️'; setTimeout(() => { btn.textContent = 'NAV'; }, 2500); }
                               fetchInvoices();
                             }}
                           >
-                            <CloudArrowUp size={12} /> NAV
+                            <CloudArrowUp size={12} /> <span id={`nav-btn-${inv.id}`}>NAV</span>
                           </button>
                         )}
                       </td>
@@ -376,7 +377,21 @@ export default function PenzugyPage() {
                               <CreditCard size={14} /> Fizet
                             </button>
                           )}
-                          <button className={styles.actionBtn} title="Nyomtatás">
+                          <button className={styles.actionBtn} title="Nyomtatás" onClick={() => {
+                            const printWindow = window.open('', '_blank', 'width=800,height=600');
+                            if (printWindow) {
+                              printWindow.document.write(`<html><head><title>Számla ${inv.invoice_number}</title><style>body{font-family:Arial,sans-serif;padding:40px;color:#082432}h1{font-size:20px;margin-bottom:8px}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{padding:8px 12px;border:1px solid #e0e0e0;text-align:left}th{background:#f5f7fa}.total{font-size:18px;font-weight:700;text-align:right;margin-top:20px}</style></head><body>`);
+                              printWindow.document.write(`<h1>Számla: ${inv.invoice_number}</h1>`);
+                              printWindow.document.write(`<p>Páciens: ${inv.patient ? `${inv.patient.last_name} ${inv.patient.first_name}` : '—'}</p>`);
+                              printWindow.document.write(`<p>Dátum: ${format(new Date(inv.issued_at), 'yyyy. MM. dd.', { locale: hu })}</p>`);
+                              printWindow.document.write(`<p>Lejárat: ${format(new Date(inv.due_date), 'yyyy. MM. dd.', { locale: hu })}</p>`);
+                              printWindow.document.write(`<p class="total">Összeg: ${formatCurrency(inv.gross_amount, inv.currency)}</p>`);
+                              printWindow.document.write(`<p>Státusz: ${STATUS_TO_BADGE[inv.payment_status]?.label || inv.payment_status}</p>`);
+                              printWindow.document.write('</body></html>');
+                              printWindow.document.close();
+                              printWindow.print();
+                            }
+                          }}>
                             <Printer size={16} />
                           </button>
                         </div>
