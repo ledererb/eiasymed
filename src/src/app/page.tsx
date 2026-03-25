@@ -7,7 +7,12 @@ import {
   CalendarPlus, ClipboardText, TrendUp,
   CalendarBlank, ArrowRight
 } from '@phosphor-icons/react';
+import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis,
+  CartesianGrid, Tooltip, ResponsiveContainer,
+} from 'recharts';
 import { createClient } from '@/lib/supabase-browser';
+import { AppShell } from '@/components/AppShell';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/Button';
 import styles from './page.module.css';
@@ -47,6 +52,8 @@ interface DashboardData {
     overdue: number;
     total: number;
   };
+  weeklyRevenue: Array<{ day: string; revenue: number }>;
+  patientAcquisition: Array<{ week: string; count: number }>;
 }
 
 const COLORS = ['#186D98', '#C43284', '#32B100', '#FF9D00', '#62AACE', '#ED51A8', '#1CEEE0', '#FFCE49'];
@@ -225,6 +232,38 @@ export default function DashboardPage() {
       });
       activity.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 
+      // Weekly revenue (last 7 days)
+      const dayNames = ['Vas', 'Hét', 'Kedd', 'Sze', 'Csüt', 'Pén', 'Szo'];
+      const weeklyRevenue: DashboardData['weeklyRevenue'] = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString();
+        const dayEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).toISOString();
+        const { data: dayInv } = await supabase
+          .from('invoices')
+          .select('total_amount')
+          .gte('created_at', dayStart)
+          .lt('created_at', dayEnd);
+        const dayTotal = (dayInv || []).reduce((s: number, inv: any) => s + Number(inv.total_amount || 0), 0);
+        weeklyRevenue.push({ day: dayNames[d.getDay()], revenue: dayTotal });
+      }
+
+      // Patient acquisition (last 4 weeks)
+      const patientAcquisition: DashboardData['patientAcquisition'] = [];
+      for (let w = 3; w >= 0; w--) {
+        const wStart = new Date(now);
+        wStart.setDate(wStart.getDate() - (w + 1) * 7);
+        const wEnd = new Date(now);
+        wEnd.setDate(wEnd.getDate() - w * 7);
+        const { count: wCount } = await supabase
+          .from('patients')
+          .select('id', { count: 'exact', head: true })
+          .gte('created_at', wStart.toISOString())
+          .lt('created_at', wEnd.toISOString());
+        patientAcquisition.push({ week: `${w === 0 ? 'Ez a hét' : `${w} hete`}`, count: wCount || 0 });
+      }
+
       setData({
         todayAppointments: scheduleItems,
         kpi: {
@@ -236,6 +275,8 @@ export default function DashboardPage() {
         recentActivity: activity.slice(0, 6),
         treatmentStats,
         invoiceStats,
+        weeklyRevenue,
+        patientAcquisition,
       });
       setLoading(false);
     }
@@ -245,9 +286,11 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
+      <AppShell>
       <div className={styles.dashboard}>
         <div className={styles.loading}>Betöltés...</div>
       </div>
+      </AppShell>
     );
   }
 
@@ -261,6 +304,7 @@ export default function DashboardPage() {
   })();
 
   return (
+    <AppShell>
     <div className={styles.dashboard}>
       {/* ── Header ── */}
       <div className={styles.dashHeader}>
@@ -381,6 +425,57 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* ── Charts Row ── */}
+      <div className={styles.bottomGrid}>
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>Heti bevétel</h2>
+            <TrendUp size={18} color="var(--color-primary-500)" />
+          </div>
+          <div style={{ width: '100%', height: 200 }}>
+            <ResponsiveContainer width="100%" height={200}>
+              <AreaChart data={data.weeklyRevenue} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#186D98" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#186D98" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-secondary)" />
+                <XAxis dataKey="day" tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }} />
+                <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }} tickFormatter={(v) => `${Math.round(v / 1000)}k`} />
+                <Tooltip formatter={(value: number) => [`${new Intl.NumberFormat('hu-HU').format(value)} Ft`, 'Bevétel']} />
+                <Area type="monotone" dataKey="revenue" stroke="#186D98" strokeWidth={2} fill="url(#revGrad)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>Új páciensek (heti)</h2>
+            <UserPlus size={18} color="#32B100" />
+          </div>
+          <div style={{ width: '100%', height: 200 }}>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={data.patientAcquisition} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="patGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#32B100" />
+                    <stop offset="100%" stopColor="#5fd42e" />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-secondary)" />
+                <XAxis dataKey="week" tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }} />
+                <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }} allowDecimals={false} />
+                <Tooltip formatter={(value: number) => [value, 'Új páciens']} />
+                <Bar dataKey="count" fill="url(#patGrad)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
       {/* ── Bottom Grid: Treatment Stats + Invoice Stats ── */}
       <div className={styles.bottomGrid}>
         <div className={styles.card}>
@@ -438,5 +533,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+    </AppShell>
   );
 }

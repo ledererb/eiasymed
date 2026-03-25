@@ -14,6 +14,7 @@ import { Drawer } from '@/components/Drawer';
 import { Button } from '@/components/Button';
 import { VisitStatusBadge } from '@/components/VisitStatusBadge/VisitStatusBadge';
 import { createClient } from '@/lib/supabase-browser';
+import { validateTAJ } from '@/lib/validation';
 import { format, differenceInMinutes, isToday, isBefore, addMinutes } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import styles from './page.module.css';
@@ -84,12 +85,13 @@ export default function PaciensekPage() {
   const [newPatientOpen, setNewPatientOpen] = useState(false);
   const [newPatientType, setNewPatientType] = useState<'lead' | 'patient'>('lead');
   const [newPatientForm, setNewPatientForm] = useState({
-    lastName: '', firstName: '', phone: '', email: '',
+    lastName: '', firstName: '', phone: '', email: '', tajNumber: '',
     birthYear: '', birthMonth: '', birthDay: '',
     language: 'magyar', currency: 'HUF',
     treatmentTag: '', campaignTag: '', partnerTag: '', discountTag: '',
     smsNotify: false, emailNotify: false,
   });
+  const [tajError, setTajError] = useState('');
   const [saving, setSaving] = useState(false);
   const [actionsOpenId, setActionsOpenId] = useState<string | null>(null);
   const router = useRouter();
@@ -204,6 +206,14 @@ export default function PaciensekPage() {
   /* ── Save new patient ── */
   const handleSaveNewPatient = async (goToCalendar: boolean) => {
     if (!newPatientForm.lastName || !newPatientForm.firstName) return;
+    // Validate TAJ if provided
+    if (newPatientForm.tajNumber) {
+      const tajResult = validateTAJ(newPatientForm.tajNumber);
+      if (!tajResult.valid) {
+        setTajError(tajResult.error || 'Hibás TAJ szám');
+        return;
+      }
+    }
     setSaving(true);
     const dob = newPatientForm.birthYear && newPatientForm.birthMonth && newPatientForm.birthDay
       ? `${newPatientForm.birthYear}-${newPatientForm.birthMonth.padStart(2, '0')}-${newPatientForm.birthDay.padStart(2, '0')}`
@@ -213,14 +223,17 @@ export default function PaciensekPage() {
       last_name: newPatientForm.lastName,
       phone: newPatientForm.phone || null,
       email: newPatientForm.email || null,
+      taj_number: newPatientForm.tajNumber?.replace(/[\s-]/g, '') || null,
       birth_date: dob,
       address_country: 'HU',
       status: newPatientType === 'lead' ? 'lead' : 'active',
+      clinic_id: '00000000-0000-0000-0000-000000000001',
     });
     setSaving(false);
     if (!error) {
       setNewPatientOpen(false);
-      setNewPatientForm({ lastName: '', firstName: '', phone: '', email: '', birthYear: '', birthMonth: '', birthDay: '', language: 'magyar', currency: 'HUF', treatmentTag: '', campaignTag: '', partnerTag: '', discountTag: '', smsNotify: false, emailNotify: false });
+      setNewPatientForm({ lastName: '', firstName: '', phone: '', email: '', tajNumber: '', birthYear: '', birthMonth: '', birthDay: '', language: 'magyar', currency: 'HUF', treatmentTag: '', campaignTag: '', partnerTag: '', discountTag: '', smsNotify: false, emailNotify: false });
+      setTajError('');
       if (goToCalendar) router.push('/naptar');
       else fetchAppointments();
     }
@@ -624,6 +637,31 @@ export default function PaciensekPage() {
                   value={newPatientForm.email}
                   onChange={e => setNewPatientForm(f => ({ ...f, email: e.target.value }))}
                 />
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formField}>
+                <span className={styles.formFieldLabel}>TAJ szám</span>
+                <input
+                  className={styles.formInput}
+                  placeholder="123 456 789"
+                  value={newPatientForm.tajNumber}
+                  onChange={e => {
+                    setNewPatientForm(f => ({ ...f, tajNumber: e.target.value }));
+                    if (tajError) {
+                      const r = validateTAJ(e.target.value);
+                      if (r.valid) setTajError('');
+                    }
+                  }}
+                  onBlur={() => {
+                    if (newPatientForm.tajNumber) {
+                      const r = validateTAJ(newPatientForm.tajNumber);
+                      setTajError(r.valid ? '' : (r.error || ''));
+                    }
+                  }}
+                  maxLength={11}
+                />
+                {tajError && <span style={{ color: '#E53E3E', fontSize: 12, marginTop: 2 }}>{tajError}</span>}
               </div>
             </div>
             <div className={styles.formRow}>

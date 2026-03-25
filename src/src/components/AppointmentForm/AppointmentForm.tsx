@@ -12,6 +12,7 @@ import styles from './AppointmentForm.module.css';
 export interface AppointmentFormData {
   patient_id: string;
   doctor_id: string;
+  assistant_id: string;
   chair_id: string;
   date: string;
   start_time: string;
@@ -56,35 +57,42 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
   const [patientSearch, setPatientSearch] = useState('');
   const [patientId, setPatientId] = useState(initialData?.patient_id || '');
   const [doctorId, setDoctorId] = useState(initialData?.doctor_id || '');
+  const [assistantId, setAssistantId] = useState(initialData?.assistant_id || '');
   const [chairId, setChairId] = useState(initialData?.chair_id || '');
   const [date, setDate] = useState(initialData?.date || defaultDate || format(new Date(), 'yyyy-MM-dd'));
   const [startTime, setStartTime] = useState(initialData?.start_time || defaultTime || '09:00');
   const [endTime, setEndTime] = useState(initialData?.end_time || '10:00');
   const [appointmentType, setAppointmentType] = useState(initialData?.appointment_type || 'consultation');
   const [notes, setNotes] = useState(initialData?.treatment_notes || '');
+  const [bookingError, setBookingError] = useState('');
 
   // Lookup data
   const [patients, setPatients] = useState<{ id: string; label: string }[]>([]);
   const [doctors, setDoctors] = useState<{ id: string; label: string }[]>([]);
+  const [assistants, setAssistants] = useState<{ id: string; label: string }[]>([]);
   const [chairs, setChairs] = useState<{ id: string; label: string }[]>([]);
 
   // Fetch doctors and chairs
   useEffect(() => {
     async function fetchLookups() {
-      const [doctorsRes, chairsRes] = await Promise.all([
+      const [doctorsRes, assistantsRes, chairsRes] = await Promise.all([
         supabase.from('staff').select('id, first_name, last_name').eq('role', 'doctor').eq('is_active', true).order('last_name'),
+        supabase.from('staff').select('id, first_name, last_name').in('role', ['assistant', 'hygienist']).eq('is_active', true).order('last_name'),
         supabase.from('chairs').select('id, name').order('display_order'),
       ]);
 
       if (doctorsRes.data) {
         setDoctors(doctorsRes.data.map(d => ({ id: d.id, label: `Dr. ${d.last_name} ${d.first_name}` })));
       }
+      if (assistantsRes.data) {
+        setAssistants(assistantsRes.data.map(a => ({ id: a.id, label: `${a.last_name} ${a.first_name}` })));
+      }
       if (chairsRes.data) {
         setChairs(chairsRes.data.map(c => ({ id: c.id, label: c.name })));
       }
     }
     fetchLookups();
-  }, []);
+  }, []);;
 
   // Search patients with debounce
   useEffect(() => {
@@ -110,9 +118,34 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setBookingError('');
+
+    // Double-booking check
+    const startISO = `${date}T${startTime}:00`;
+    const endISO = `${date}T${endTime}:00`;
+    let query = supabase
+      .from('appointments')
+      .select('id')
+      .eq('doctor_id', doctorId)
+      .lt('start_time', endISO)
+      .gt('end_time', startISO)
+      .not('status', 'eq', 'cancelled');
+
+    // Exclude current appointment when editing
+    if (initialData?.id) {
+      query = query.not('id', 'eq', initialData.id);
+    }
+
+    const { data: conflicts } = await query;
+    if (conflicts && conflicts.length > 0) {
+      setBookingError('Ütközés! Az orvosnak már van időpontja ebben az időszakban.');
+      return;
+    }
+
     await onSave({
       patient_id: patientId,
       doctor_id: doctorId,
+      assistant_id: assistantId,
       chair_id: chairId,
       date,
       start_time: startTime,
@@ -161,7 +194,7 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
         )}
       </div>
 
-      {/* Doctor + Chair row */}
+      {/* Doctor + Assistant + Chair row */}
       <div className={styles.row}>
         <div className={styles.field}>
           <label className={styles.label}>Orvos *</label>
@@ -170,6 +203,15 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
             value={doctorId}
             placeholder="Válasszon orvost..."
             onChange={(v) => setDoctorId(v as string)}
+          />
+        </div>
+        <div className={styles.field}>
+          <label className={styles.label}>Asszisztens</label>
+          <Dropdown
+            items={[{ id: '', label: 'Nincs kiválasztva' }, ...assistants]}
+            value={assistantId}
+            placeholder="Válasszon asszisztenst..."
+            onChange={(v) => setAssistantId(v as string)}
           />
         </div>
         <div className={styles.field}>
@@ -233,6 +275,13 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
           rows={3}
         />
       </div>
+
+      {/* Booking error */}
+      {bookingError && (
+        <div style={{ color: '#E53E3E', fontSize: 13, padding: '8px 12px', background: '#FED7D7', borderRadius: 8, margin: '0 0 12px' }}>
+          ⚠️ {bookingError}
+        </div>
+      )}
 
       {/* Actions */}
       <div className={styles.actions}>
